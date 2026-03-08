@@ -229,7 +229,8 @@
 }
 
 /* --- Skills Grid --- */
-.skills-grid {
+.skills-grid,
+.skills-grid-v2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;

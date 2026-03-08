@@ -7,10 +7,62 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="css/navbar-auth.css">
+  <style>
+    .admin-tabs{display:flex;gap:0;background:var(--dark3);border-radius:12px;padding:4px;border:1px solid var(--border);margin-bottom:24px;width:fit-content}
+    .admin-tab{padding:10px 24px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+    .admin-tab:hover{color:white;background:rgba(255,255,255,.05)}
+    .admin-tab.active{background:linear-gradient(135deg,var(--blue2),#2563eb);color:white;box-shadow:0 2px 12px rgba(59,130,246,.35)}
+    .admin-tab-content{display:none}.admin-tab-content.active{display:block}
+    .cms-section{background:var(--dark3);border:1px solid var(--border);border-radius:16px;margin-bottom:24px;overflow:hidden}
+    .cms-section-header{display:flex;align-items:center;gap:12px;padding:18px 24px;background:rgba(240,192,64,.04);border-bottom:1px solid var(--border)}
+    .cms-section-header h3{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin:0;letter-spacing:1px}
+    .cms-section-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:rgba(240,192,64,.15);color:var(--gold);border:1px solid rgba(240,192,64,.3);flex-shrink:0}
+    .cms-section-body{padding:24px}
+    .two-col{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+    @media(max-width:768px){.two-col{grid-template-columns:1fr}}
+    .portrait-upload{width:100%;aspect-ratio:3/4;border:2px dashed var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s;overflow:hidden;position:relative;background:var(--dark2)}
+    .portrait-upload:hover{border-color:var(--gold)}
+    .portrait-upload img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+    .portrait-upload .upload-text{text-align:center;color:var(--muted);font-size:13px;z-index:1}
+    .portrait-upload .upload-text span{font-size:36px;display:block;margin-bottom:8px}
+    .weapon-toggles{display:flex;flex-wrap:wrap;gap:8px}
+    .weapon-toggle{padding:10px 18px;border:1px solid var(--border);border-radius:8px;background:var(--dark2);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;user-select:none}
+    .weapon-toggle:hover{border-color:var(--gold);color:var(--gold)}
+    .weapon-toggle.selected{background:rgba(240,192,64,.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(240,192,64,.15)}
+    .skill-expand-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+    .skill-expand-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;transition:background .2s}
+    .skill-expand-header:hover{background:rgba(255,255,255,.02)}
+    .skill-expand-header .skill-title{font-weight:700;font-size:14px;color:var(--text)}
+    .skill-expand-header .skill-type-tag{font-size:11px;padding:2px 10px;border-radius:12px;font-weight:600;background:rgba(96,165,250,.15);color:var(--blue)}
+    .skill-expand-header .expand-arrow{color:var(--muted);transition:transform .2s;font-size:16px}
+    .skill-expand-header .expand-arrow.open{transform:rotate(180deg)}
+    .skill-expand-body{padding:0 16px 16px;display:none}.skill-expand-body.open{display:block}
+    .potentials-grid-cms{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:600px){.potentials-grid-cms{grid-template-columns:1fr}}
+    .pot-card-cms{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px}
+    .pot-card-cms label{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:6px;display:block}
+    .pot-card-cms textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--dark3);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box}
+    .pot-card-cms textarea:focus{outline:none;border-color:var(--gold)}
+    .costume-item-cms{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .costume-item-cms input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--dark3);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:13px}
+    .costume-item-cms input:focus{outline:none;border-color:var(--gold)}
+    .step-indicator{display:flex;justify-content:center;gap:0;margin-bottom:32px;flex-wrap:wrap}
+    .step-item{display:flex;align-items:center}
+    .step-item:last-child .step-line{display:none}
+    .step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:var(--dark3);border:2px solid var(--border);color:var(--muted);transition:all .3s;cursor:pointer}
+    .step-circle.active{background:linear-gradient(135deg,#c8960c,#f0c040);border-color:var(--gold);color:#0b1020;box-shadow:0 0 16px rgba(240,192,64,.3)}
+    .step-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:6px;text-align:center}
+    .step-label.active{color:var(--gold)}
+    .step-line{width:40px;height:2px;background:var(--border);margin:0 8px;align-self:center}
+    .step-wrapper{display:flex;flex-direction:column;align-items:center}
+    .weapon-tab-btn{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:var(--dark2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+    .weapon-tab-btn:hover{border-color:var(--gold);color:var(--gold)}
+    .weapon-tab-btn.active{background:rgba(240,192,64,.15);border-color:var(--gold);color:var(--gold)}
+    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  </style>
 </head>
 <body>
 
-  <!-- Admin Bar -->
   <div class="admin-bar" id="adminBar">
     <div class="admin-bar-left">
       <span class="admin-badge">ADMIN PANEL</span>
@@ -35,141 +87,173 @@
 
   <div class="page-content" style="padding-top:104px;">
     <div class="container">
-
-      <!-- Connection Status -->
       <div id="connectionStatus" style="margin-bottom:16px;"></div>
-
-      <!-- Dashboard Header -->
       <div class="admin-header">
-        <h1>&#128736; Character Management</h1>
-        <p>Add, edit, and manage all character data via Supabase</p>
+        <h1>&#128736; Admin Dashboard</h1>
+        <p>Manage characters and events</p>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="admin-actions">
-        <button class="btn btn-gold" onclick="showAddForm()">Add New Character</button>
-        <button class="btn btn-blue" onclick="doExport()">Export JSON</button>
-        <button class="btn btn-purple" onclick="importTierList()">Import From Tier List</button>
-        <label class="btn btn-outline" style="cursor:pointer;">
-          Import JSON
-          <input type="file" accept=".json" style="display:none;" onchange="handleImport(event)">
-        </label>
+      <!-- Admin Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('characters',this)">&#9876; Characters</button>
+        <button class="admin-tab" onclick="switchAdminTab('events',this)">&#127881; Events</button>
       </div>
 
-      <!-- Stats -->
-      <div class="admin-stats" id="adminStats"></div>
-
-      <!-- Character List -->
-      <div class="admin-section">
-        <div class="admin-section-header">
-          <h2>All Characters</h2>
-          <input type="text" id="adminSearch" class="admin-search" placeholder="Search characters..." oninput="filterAdminList()">
+      <!-- ═══ CHARACTERS TAB ═══ -->
+      <div class="admin-tab-content active" id="tab-characters">
+        <div class="admin-actions">
+          <button class="btn btn-gold" onclick="showAddForm()">+ Add New Character</button>
+          <button class="btn btn-blue" onclick="doExport()">Export JSON</button>
+          <label class="btn btn-outline" style="cursor:pointer;">Import JSON<input type="file" accept=".json" style="display:none;" onchange="handleImport(event)"></label>
         </div>
-        <div class="admin-char-list" id="adminCharList"></div>
+        <div class="admin-stats" id="adminStats"></div>
+        <div class="admin-section">
+          <div class="admin-section-header">
+            <h2>All Characters</h2>
+            <input type="text" id="adminSearch" class="admin-search" placeholder="Search characters..." oninput="filterAdminList()">
+          </div>
+          <div class="admin-char-list" id="adminCharList"></div>
+        </div>
       </div>
 
-      <!-- Add/Edit Form Modal -->
+      <!-- ═══ EVENTS TAB ═══ -->
+      <div class="admin-tab-content" id="tab-events">
+        <div class="admin-actions">
+          <button class="btn btn-gold" onclick="showAddEventForm()">+ Add New Event</button>
+        </div>
+        <div class="admin-stats" id="eventStats"></div>
+        <div class="admin-section">
+          <div class="admin-section-header">
+            <h2>All Events</h2>
+            <input type="text" id="eventSearch" class="admin-search" placeholder="Search events..." oninput="filterEventList()">
+          </div>
+          <div class="admin-char-list" id="adminEventList"></div>
+        </div>
+      </div>
+
+      <!-- ═══ CHARACTER FORM MODAL ═══ -->
       <div class="admin-form-overlay" id="formOverlay" style="display:none;" onclick="closeFormOverlay(event)">
         <div class="admin-form-modal" onclick="event.stopPropagation();">
           <div class="form-modal-header">
             <h2 id="formTitle">Add New Character</h2>
             <button class="form-close-btn" onclick="hideForm()">&times;</button>
           </div>
-
           <div class="form-modal-body">
             <input type="hidden" id="editId">
+            <div class="step-indicator">
+              <div class="step-item"><div class="step-wrapper"><div class="step-circle active" onclick="scrollToSection('sec-info')">1</div><div class="step-label active">Info</div></div><div class="step-line"></div></div>
+              <div class="step-item"><div class="step-wrapper"><div class="step-circle" onclick="scrollToSection('sec-weapons')">2</div><div class="step-label">Weapons</div></div><div class="step-line"></div></div>
+              <div class="step-item"><div class="step-wrapper"><div class="step-circle" onclick="scrollToSection('sec-skills')">3</div><div class="step-label">Skills</div></div><div class="step-line"></div></div>
+              <div class="step-item"><div class="step-wrapper"><div class="step-circle" onclick="scrollToSection('sec-potentials')">4</div><div class="step-label">Potentials</div></div><div class="step-line"></div></div>
+              <div class="step-item"><div class="step-wrapper"><div class="step-circle" onclick="scrollToSection('sec-costumes')">5</div><div class="step-label">Costumes</div></div></div>
+            </div>
 
-            <!-- Basic Info -->
-            <div class="form-section">
-              <h3>Basic Information</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Character Name *</label>
-                  <input type="text" id="charName" placeholder="e.g. Meliodas" required>
-                </div>
-                <div class="form-group">
-                  <label>Rarity *</label>
-                  <select id="charRarity">
-                    <option value="SSR">SSR</option>
-                    <option value="SR">SR</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Tier</label>
-                  <select id="charTier">
-                    <option value="S">S</option>
-                    <option value="A">A</option>
-                    <option value="B" selected>B</option>
-                    <option value="C">C</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Slug (auto-generated)</label>
-                  <input type="text" id="charSlug" placeholder="auto-generated-from-name" readonly style="opacity:0.6;">
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Description</label>
-                <textarea id="charDesc" rows="3" placeholder="Character background story..."></textarea>
-              </div>
-              <div class="form-group">
-                <label>Character Image</label>
-                <div class="image-upload-area" id="imageUploadArea">
-                  <input type="file" id="charImage" accept="image/*" onchange="handleImageUpload(this)" style="display:none;">
-                  <div class="image-preview" id="imagePreview" style="display:none;">
-                    <img id="previewImg" src="" alt="Preview">
+            <!-- SECTION 1 -->
+            <div class="cms-section" id="sec-info">
+              <div class="cms-section-header"><div class="cms-section-num">1</div><h3>Character Info</h3></div>
+              <div class="cms-section-body">
+                <div class="two-col">
+                  <div>
+                    <div class="portrait-upload" id="portraitUpload" onclick="document.getElementById('charImage').click();">
+                      <input type="file" id="charImage" accept="image/*" onchange="handleImageUpload(this)" style="display:none;">
+                      <img id="previewImg" src="" alt="Preview" style="display:none;">
+                      <div class="upload-text" id="imagePrompt"><span>&#128247;</span><p>Click to upload</p><p style="font-size:11px;margin-top:4px;color:#60a5fa;">PNG, JPG</p></div>
+                    </div>
                   </div>
-                  <div class="image-upload-prompt" id="imagePrompt" onclick="document.getElementById('charImage').click();">
-                    <span>&#128247;</span>
-                    <p>Click to upload image</p>
-                    <p class="small">PNG, JPG (recommended: 256x256)</p>
-                    <p class="small" style="color:#60a5fa;">Images are uploaded to Supabase Storage</p>
+                  <div>
+                    <div class="form-group"><label>Character Name *</label><input type="text" id="charName" placeholder="e.g. Meliodas" required></div>
+                    <div class="form-group"><label>Slug</label><input type="text" id="charSlug" placeholder="auto-generated" readonly style="opacity:.6;"></div>
+                    <div class="form-row">
+                      <div class="form-group"><label>Rarity</label><select id="charRarity"><option value="SSR">SSR</option><option value="SR">SR</option></select></div>
+                      <div class="form-group"><label>Tier</label><select id="charTier"><option value="S">S</option><option value="A">A</option><option value="B" selected>B</option><option value="C">C</option></select></div>
+                    </div>
+                    <div class="form-group"><label>Description</label><textarea id="charDesc" rows="3" placeholder="Character background story..."></textarea></div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Weapon Types -->
-            <div class="form-section">
-              <h3>Weapon Types</h3>
-              <div class="form-group">
-                <label>Select up to 3 weapon types</label>
-                <div class="weapon-checkboxes" id="weaponCheckboxes"></div>
+            <!-- SECTION 2 -->
+            <div class="cms-section" id="sec-weapons">
+              <div class="cms-section-header"><div class="cms-section-num">2</div><h3>Weapon Types</h3></div>
+              <div class="cms-section-body">
+                <p class="form-hint">Select weapon types (multiple allowed)</p>
+                <div class="weapon-toggles" id="weaponToggles"></div>
               </div>
             </div>
 
-            <!-- Skills (per weapon) -->
-            <div class="form-section">
-              <h3>Skills</h3>
-              <p class="form-hint">Configure skills for each selected weapon type</p>
-              <div class="weapon-skills-tabs" id="weaponSkillsTabs"></div>
-              <div id="skillsEditor"></div>
+            <!-- SECTION 3 -->
+            <div class="cms-section" id="sec-skills">
+              <div class="cms-section-header"><div class="cms-section-num">3</div><h3>Skills</h3></div>
+              <div class="cms-section-body">
+                <p class="form-hint">Configure skills for each weapon type</p>
+                <div id="weaponSkillsTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;"></div>
+                <div id="skillsEditor"></div>
+              </div>
             </div>
 
-            <!-- Potentials (per weapon) -->
-            <div class="form-section">
-              <h3>Potentials</h3>
-              <p class="form-hint">10 tiers per weapon type</p>
-              <div class="weapon-potentials-tabs" id="weaponPotentialsTabs"></div>
-              <div id="potentialsEditor"></div>
+            <!-- SECTION 4 -->
+            <div class="cms-section" id="sec-potentials">
+              <div class="cms-section-header"><div class="cms-section-num">4</div><h3>Potentials</h3></div>
+              <div class="cms-section-body">
+                <p class="form-hint">10 tiers per weapon type</p>
+                <div id="weaponPotentialsTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;"></div>
+                <div id="potentialsEditor"></div>
+              </div>
             </div>
 
-            <!-- Costumes -->
-            <div class="form-section">
-              <h3>Costumes</h3>
-              <div id="costumesEditor"></div>
-              <button type="button" class="btn-add-item" onclick="addCostumeField()">+ Add Costume</button>
+            <!-- SECTION 5 -->
+            <div class="cms-section" id="sec-costumes">
+              <div class="cms-section-header"><div class="cms-section-num">5</div><h3>Costumes</h3></div>
+              <div class="cms-section-body">
+                <div id="costumesEditor"></div>
+                <button type="button" class="btn-add-item" onclick="addCostumeField()" style="margin-top:12px;">+ Add Costume</button>
+              </div>
             </div>
           </div>
-
           <div class="form-modal-footer">
             <button class="btn btn-outline" onclick="hideForm()">Cancel</button>
-            <button class="btn btn-gold" id="saveBtn" onclick="saveCharacter()">
-              <span id="saveBtnText">Save Character</span>
-              <span id="saveBtnLoading" style="display:none;">Saving...</span>
-            </button>
+            <button class="btn btn-gold" id="saveBtn" onclick="saveCharacter()"><span id="saveBtnText">Save Character</span><span id="saveBtnLoading" style="display:none;">Saving...</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ EVENT FORM MODAL ═══ -->
+      <div class="admin-form-overlay" id="eventFormOverlay" style="display:none;" onclick="closeEventFormOverlay(event)">
+        <div class="admin-form-modal" onclick="event.stopPropagation();">
+          <div class="form-modal-header">
+            <h2 id="eventFormTitle">Add New Event</h2>
+            <button class="form-close-btn" onclick="hideEventForm()">&times;</button>
+          </div>
+          <div class="form-modal-body">
+            <input type="hidden" id="editEventId">
+            <div class="cms-section">
+              <div class="cms-section-header"><div class="cms-section-num">1</div><h3>Event Info</h3></div>
+              <div class="cms-section-body">
+                <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" placeholder="e.g. Holy War Raid"></div>
+                <div class="form-group"><label>Description *</label><textarea id="eventDesc" rows="3" placeholder="Event description..."></textarea></div>
+                <div class="form-row">
+                  <div class="form-group"><label>Status</label><select id="eventStatus"><option value="active">Active</option><option value="upcoming">Upcoming</option><option value="ended">Ended</option></select></div>
+                  <div class="form-group"><label>Tag</label><select id="eventTag"><option value="event">Event</option><option value="update">Update</option><option value="guide">Guide</option><option value="maintenance">Maintenance</option></select></div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Start Date</label><input type="date" id="eventStart"></div>
+                  <div class="form-group"><label>End Date</label><input type="date" id="eventEnd"></div>
+                </div>
+                <div class="form-group"><label>Banner Color (CSS)</label><input type="text" id="eventColor" placeholder="linear-gradient(90deg,#3b82f6,#60a5fa)" value="linear-gradient(90deg,#3b82f6,#60a5fa)"></div>
+              </div>
+            </div>
+            <div class="cms-section">
+              <div class="cms-section-header"><div class="cms-section-num">2</div><h3>Rewards</h3></div>
+              <div class="cms-section-body">
+                <div id="rewardsEditor"></div>
+                <button type="button" class="btn-add-item" onclick="addRewardField()" style="margin-top:12px;">+ Add Reward</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-modal-footer">
+            <button class="btn btn-outline" onclick="hideEventForm()">Cancel</button>
+            <button class="btn btn-gold" onclick="saveEvent()"><span id="saveEventBtnText">Save Event</span><span id="saveEventBtnLoading" style="display:none;">Saving...</span></button>
           </div>
         </div>
       </div>
@@ -177,11 +261,8 @@
     </div>
   </div>
 
-  <footer class="site-footer">
-    <p>7DS Origin Database &mdash; Admin Panel &mdash; Powered by Supabase</p>
-  </footer>
+  <footer class="site-footer"><p>7DS Origin Database &mdash; Admin Panel &mdash; Powered by Supabase</p></footer>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
@@ -189,598 +270,329 @@
   <script src="js/auth.js"></script>
   <script src="js/navbar.js"></script>
   <script>
-    // ---- Constants ----
-    var ALL_WEAPONS = ['Axe','Book','Cudgel','Dual Swords','Gauntlets','Greatsword','Lance','Longsword','Rapier','Shield','Staff','Wand'];
-    var SKILL_TYPES = ['Adventure','Passive','Normal Attack','Special','Skill','Tag','Ultimate'];
-    var editingId = null;
-    var currentSkillWeapon = null;
-    var currentPotWeapon = null;
-    var tempSkills = {};
-    var tempPotentials = {};
-    var tempImageFile = null;
-    var allCharacters = [];
+    var ALL_WEAPONS=['Axe','Book','Cudgel','Dual Swords','Gauntlets','Greatsword','Lance','Longsword','Rapier','Shield','Staff','Wand'];
+    var SKILL_TYPES=['Adventure','Passive','Normal Attack','Special','Skill','Tag','Ultimate'];
+    var editingId=null,currentSkillWeapon=null,currentPotWeapon=null,tempSkills={},tempPotentials={},tempImageFile=null,allCharacters=[];
+    var allEvents=[],editingEventId=null;
 
-    // ---- Init ----
-    document.addEventListener("DOMContentLoaded", async () => {
-      // Auth check
-      const admin = await Auth.isLoggedIn();
-      if (!admin) {
-        window.location.href = 'login.html';
-        return;
+    function switchAdminTab(tab,btn){
+      document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-'+tab).classList.add('active');
+    }
+
+    /* ── Events localStorage ── */
+    function loadEventsFromStorage(){
+      var s=localStorage.getItem('7ds_events');
+      if(s){try{allEvents=JSON.parse(s)}catch(e){allEvents=getDefaultEvents()}}else{allEvents=getDefaultEvents()}
+    }
+    function saveEventsToStorage(){localStorage.setItem('7ds_events',JSON.stringify(allEvents))}
+    function getDefaultEvents(){return[
+      {id:1,status:'active',tag:'event',title:'Holy War Raid',desc:'Team up with allies to defeat the Demon King in the limited-time Holy War Raid. Earn exclusive SSR shards and rare equipment.',start:'2026-03-01',end:'2026-03-15',color:'linear-gradient(90deg,#3b82f6,#60a5fa)',rewards:['SSR Shard x3','Gold x50,000','Raid Medal x20']},
+      {id:2,status:'active',tag:'update',title:'New Character: Tristan',desc:'The son of Meliodas and Elizabeth joins the battle. Limited banner available for a short time with boosted SSR rates.',start:'2026-03-05',end:'2026-03-20',color:'linear-gradient(90deg,#f0c040,#ffd966)',rewards:['Tristan SSR','Summon Ticket x10','Gems x500']},
+      {id:3,status:'active',tag:'event',title:'Daily Login Bonus',desc:'Log in every day during March to collect cumulative rewards including gems, tickets, and rare materials.',start:'2026-03-01',end:'2026-03-31',color:'linear-gradient(90deg,#0be881,#34d399)',rewards:['Gems x1,200','Summon Ticket x5','EXP Potion x30']},
+      {id:4,status:'upcoming',tag:'event',title:'Guild War Season 4',desc:'Compete against guilds worldwide in the new Guild War season.',start:'2026-03-20',end:'2026-04-05',color:'linear-gradient(90deg,#a78bfa,#c4b5fd)',rewards:['Guild Crest','Gems x2,000','Exclusive Title']},
+      {id:5,status:'upcoming',tag:'event',title:'Spring Festival',desc:'Celebrate the spring season with special story quests and limited cosmetics.',start:'2026-03-25',end:'2026-04-10',color:'linear-gradient(90deg,#f472b6,#fb7185)',rewards:['Spring Costume','Gems x800','Flower Tokens x100']},
+      {id:6,status:'ended',tag:'event',title:"Valentine's Day Event",desc:"A special event celebrating Valentine's Day with exclusive story content.",start:'2026-02-10',end:'2026-02-28',color:'linear-gradient(90deg,#f43f5e,#fb7185)',rewards:['Heart Charm','Gems x600','Valentine Frame']}
+    ]}
+
+    /* ── Init ── */
+    document.addEventListener("DOMContentLoaded",async()=>{
+      const admin=await Auth.isLoggedIn();
+      if(!admin){window.location.href='login.html';return}
+      if(SupaDB.isConnected()){
+        const session=await SupaDB.getSession();
+        document.getElementById('adminEmail').textContent=session.user.email;
+        document.getElementById('connectionStatus').innerHTML='<div style="padding:12px 16px;background:#052e16;border:1px solid #16a34a;border-radius:8px;color:#86efac;font-size:14px;">&#9989; Connected to Supabase</div>';
+      }else{
+        document.getElementById('connectionStatus').innerHTML='<div style="padding:12px 16px;background:#7f1d1d;border:1px solid #dc2626;border-radius:8px;color:#fca5a5;font-size:14px;">&#9888; Supabase not connected</div>';
       }
-
-      // Connection status
-      if (SupaDB.isConnected()) {
-        const session = await SupaDB.getSession();
-        document.getElementById('adminEmail').textContent = session.user.email;
-        document.getElementById('connectionStatus').innerHTML =
-          '<div style="padding:12px 16px;background:#052e16;border:1px solid #16a34a;border-radius:8px;color:#86efac;font-size:14px;">' +
-          '&#9989; Connected to Supabase &mdash; Data is saved to the cloud' +
-          '</div>';
-      } else {
-        document.getElementById('connectionStatus').innerHTML =
-          '<div style="padding:12px 16px;background:#7f1d1d;border:1px solid #dc2626;border-radius:8px;color:#fca5a5;font-size:14px;">' +
-          '&#9888; Supabase initialization failed. Check console for errors.' +
-          '</div>';
-      }
-
-      // Load characters
-      allCharacters = await CharDB.loadAll();
+      allCharacters=await CharDB.loadAll();
       renderDashboard();
-
-      // Realtime updates
-      SupaDB.subscribeToChanges(async () => {
-        allCharacters = await CharDB.loadAll();
-        renderDashboard();
-        showNotification('Data updated (realtime)', 'info');
-      });
+      loadEventsFromStorage();
+      renderEventDashboard();
+      SupaDB.subscribeToChanges(async()=>{allCharacters=await CharDB.loadAll();renderDashboard();showNotification('Data updated','info')});
     });
 
-    // ---- Dashboard ----
-    function renderDashboard() {
-      var chars = allCharacters;
-      var ssrCount = chars.filter(function(c) { return c.rarity === 'SSR'; }).length;
-      var srCount = chars.filter(function(c) { return c.rarity === 'SR'; }).length;
-      var withSkills = chars.filter(function(c) {
-        if (!c.skills || typeof c.skills !== 'object') return false;
-        for (var k in c.skills) { if (c.skills[k] && c.skills[k].length > 0) return true; }
-        return false;
-      }).length;
-
-      document.getElementById('adminStats').innerHTML =
-        '<div class="stat-card"><div class="stat-num">' + chars.length + '</div><div class="stat-label">Total Characters</div></div>' +
-        '<div class="stat-card ssr"><div class="stat-num">' + ssrCount + '</div><div class="stat-label">SSR</div></div>' +
-        '<div class="stat-card sr"><div class="stat-num">' + srCount + '</div><div class="stat-label">SR</div></div>' +
-        '<div class="stat-card"><div class="stat-num">' + withSkills + '</div><div class="stat-label">With Skills</div></div>';
-
-      renderCharList(chars);
+    /* ── Character Dashboard ── */
+    function renderDashboard(){
+      var c=allCharacters,ssr=c.filter(x=>x.rarity==='SSR').length,sr=c.filter(x=>x.rarity==='SR').length;
+      var ws=c.filter(x=>{if(!x.skills||typeof x.skills!=='object')return false;for(var k in x.skills){if(x.skills[k]&&x.skills[k].length>0)return true}return false}).length;
+      document.getElementById('adminStats').innerHTML=
+        '<div class="stat-card"><div class="stat-num">'+c.length+'</div><div class="stat-label">Total</div></div>'+
+        '<div class="stat-card ssr"><div class="stat-num">'+ssr+'</div><div class="stat-label">SSR</div></div>'+
+        '<div class="stat-card sr"><div class="stat-num">'+sr+'</div><div class="stat-label">SR</div></div>'+
+        '<div class="stat-card"><div class="stat-num">'+ws+'</div><div class="stat-label">With Skills</div></div>';
+      renderCharList(c);
     }
-
-    function renderCharList(chars) {
-      // Handle empty state
-      if (!chars || chars.length === 0) {
-        document.getElementById('adminCharList').innerHTML = 
-          '<div style="text-align:center;padding:60px 20px;color:#64748b;">' +
-          '<p style="font-size:48px;margin-bottom:16px;">&#128683;</p>' +
-          '<p style="font-size:16px;font-weight:600;margin-bottom:8px;">No characters found</p>' +
-          '<p style="font-size:14px;margin-bottom:24px;">Use \'Add New Character\' or import JSON to populate the database.</p>' +
-          '<button class="btn btn-gold" onclick="showAddForm()" style="margin-top:12px;">+ Add New Character</button>' +
-          '</div>';
-        return;
-      }
-
-      var html = '';
-      chars.forEach(function(c) {
-        var hasSkills = false;
-        if (c.skills && typeof c.skills === 'object') {
-          for (var k in c.skills) { if (c.skills[k] && c.skills[k].length > 0) { hasSkills = true; break; } }
-        }
-        var statusClass = hasSkills ? 'status-complete' : 'status-incomplete';
-        var statusText = hasSkills ? 'Complete' : 'Incomplete';
-        var tierBadge = '<span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:' +
-          getTierColor(c.tier) + ';color:#fff;margin-left:6px;">' + (c.tier || 'B') + '</span>';
-        var imgUrl = c.image || 'https://placehold.co/300x400?text=No+Image';
-
-        html += '<div class="admin-char-row" data-name="' + (c.name || '').toLowerCase() + '">';
-        html += '<div class="admin-char-info">';
-        html += '<img src="' + imgUrl + '" alt="' + (c.name || '') + '" class="admin-char-thumb" onerror="this.src=\'https://placehold.co/300x400?text=Error\'">';
-        html += '<div>';
-        html += '<div class="admin-char-name">' + (c.name || 'Unknown') + tierBadge + '</div>';
-        html += '<div class="admin-char-meta"><span class="rarity-tag ' + (c.rarity || 'SR') + '">' + (c.rarity || 'SR') + '</span>';
-        html += ' &bull; ' + (c.types || []).join(', ');
-        html += ' &bull; <span class="' + statusClass + '">' + statusText + '</span></div>';
-        html += '</div></div>';
-        html += '<div class="admin-char-actions">';
-        html += '<a href="character.html?slug=' + encodeURIComponent(c.slug) + '" class="action-btn view-btn" title="View">&#128065;</a>';
-        html += '<button class="action-btn edit-btn" title="Edit" onclick="editCharacter(\'' + c.id + '\')">&#9998;</button>';
-        html += '<button class="action-btn delete-btn" title="Delete" onclick="deleteCharacter(\'' + c.id + '\',\'' + (c.name || '').replace(/'/g, "\\\'" ) + '\')">&#128465;</button>';
-        html += '</div></div>';
+    function renderCharList(chars){
+      if(!chars||chars.length===0){document.getElementById('adminCharList').innerHTML='<div style="text-align:center;padding:60px 20px;color:#64748b;"><p style="font-size:48px;margin-bottom:16px;">&#128683;</p><p>No characters found</p><button class="btn btn-gold" onclick="showAddForm()" style="margin-top:12px;">+ Add Character</button></div>';return}
+      var h='';
+      chars.forEach(function(c){
+        var hasSkills=false;if(c.skills&&typeof c.skills==='object'){for(var k in c.skills){if(c.skills[k]&&c.skills[k].length>0){hasSkills=true;break}}}
+        var sc=hasSkills?'status-complete':'status-incomplete',st=hasSkills?'Complete':'Incomplete';
+        var tc={S:'#dc2626',A:'#f59e0b',B:'#3b82f6',C:'#6b7280'};
+        var tb='<span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:'+(tc[c.tier]||tc.B)+';color:#fff;margin-left:6px;">'+(c.tier||'B')+'</span>';
+        var img=c.image||'https://placehold.co/300x400?text=No+Image';
+        h+='<div class="admin-char-row" data-name="'+(c.name||'').toLowerCase()+'">';
+        h+='<div class="admin-char-info"><img src="'+img+'" alt="'+(c.name||'')+'" class="admin-char-thumb" onerror="this.src=\'https://placehold.co/300x400?text=Error\'"><div>';
+        h+='<div class="admin-char-name">'+(c.name||'Unknown')+tb+'</div>';
+        h+='<div class="admin-char-meta"><span class="rarity-tag '+(c.rarity||'SR')+'">'+(c.rarity||'SR')+'</span> &bull; '+(c.types||[]).join(', ')+' &bull; <span class="'+sc+'">'+st+'</span></div>';
+        h+='</div></div><div class="admin-char-actions">';
+        h+='<a href="character.html?slug='+encodeURIComponent(c.slug)+'" class="action-btn view-btn" title="View">&#128065;</a>';
+        h+='<button class="action-btn edit-btn" title="Edit" onclick="editCharacter(\''+c.id+'\')">&#9998;</button>';
+        h+='<button class="action-btn delete-btn" title="Delete" onclick="deleteCharacter(\''+c.id+'\',\''+(c.name||'').replace(/'/g,"\\'")+'\')">&#128465;</button>';
+        h+='</div></div>';
       });
-      document.getElementById('adminCharList').innerHTML = html;
+      document.getElementById('adminCharList').innerHTML=h;
     }
+    function filterAdminList(){var s=document.getElementById('adminSearch').value.toLowerCase();document.querySelectorAll('#adminCharList .admin-char-row').forEach(r=>{r.style.display=(r.getAttribute('data-name')||'').indexOf(s)!==-1?'':'none'})}
 
-    function getTierColor(tier) {
-      var colors = { S: '#dc2626', A: '#f59e0b', B: '#3b82f6', C: '#6b7280' };
-      return colors[tier] || colors.B;
+    /* ── Event Dashboard ── */
+    function renderEventDashboard(){
+      var a=allEvents.filter(e=>e.status==='active').length,u=allEvents.filter(e=>e.status==='upcoming').length,en=allEvents.filter(e=>e.status==='ended').length;
+      document.getElementById('eventStats').innerHTML=
+        '<div class="stat-card"><div class="stat-num">'+allEvents.length+'</div><div class="stat-label">Total</div></div>'+
+        '<div class="stat-card ssr"><div class="stat-num">'+a+'</div><div class="stat-label">Active</div></div>'+
+        '<div class="stat-card sr"><div class="stat-num">'+u+'</div><div class="stat-label">Upcoming</div></div>'+
+        '<div class="stat-card"><div class="stat-num">'+en+'</div><div class="stat-label">Ended</div></div>';
+      renderEventList();
     }
-
-    function filterAdminList() {
-      var search = document.getElementById('adminSearch').value.toLowerCase();
-      document.querySelectorAll('.admin-char-row').forEach(function(row) {
-        var name = row.getAttribute('data-name') || '';
-        row.style.display = name.indexOf(search) !== -1 ? '' : 'none';
+    function renderEventList(){
+      if(!allEvents||allEvents.length===0){document.getElementById('adminEventList').innerHTML='<div style="text-align:center;padding:60px 20px;color:#64748b;"><p style="font-size:48px;">&#127881;</p><p>No events</p><button class="btn btn-gold" onclick="showAddEventForm()" style="margin-top:12px;">+ Add Event</button></div>';return}
+      var h='';
+      allEvents.forEach(function(ev){
+        var sc=ev.status==='active'?'#22c55e':ev.status==='upcoming'?'#3b82f6':'#6b7280';
+        var sl=ev.status.charAt(0).toUpperCase()+ev.status.slice(1);
+        var tl=(ev.tag||'event').charAt(0).toUpperCase()+(ev.tag||'event').slice(1);
+        h+='<div class="admin-char-row" data-name="'+(ev.title||'').toLowerCase()+'">';
+        h+='<div class="admin-char-info"><div style="width:44px;height:44px;border-radius:8px;background:'+(ev.color||'var(--dark3)')+';flex-shrink:0;"></div><div>';
+        h+='<div class="admin-char-name">'+(ev.title||'Untitled')+' <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:'+sc+';color:#fff;margin-left:6px;">'+sl+'</span></div>';
+        h+='<div class="admin-char-meta">'+tl+' &bull; '+(ev.start||'')+' &rarr; '+(ev.end||'')+'</div>';
+        h+='</div></div><div class="admin-char-actions">';
+        h+='<button class="action-btn edit-btn" title="Edit" onclick="editEvent('+ev.id+')">&#9998;</button>';
+        h+='<button class="action-btn delete-btn" title="Delete" onclick="deleteEvent('+ev.id+')">&#128465;</button>';
+        h+='</div></div>';
       });
+      document.getElementById('adminEventList').innerHTML=h;
+    }
+    function filterEventList(){var s=document.getElementById('eventSearch').value.toLowerCase();document.querySelectorAll('#adminEventList .admin-char-row').forEach(r=>{r.style.display=(r.getAttribute('data-name')||'').indexOf(s)!==-1?'':'none'})}
+
+    /* ── Event Form ── */
+    function showAddEventForm(){
+      editingEventId=null;
+      document.getElementById('eventFormTitle').textContent='Add New Event';
+      document.getElementById('editEventId').value='';
+      document.getElementById('eventTitle').value='';
+      document.getElementById('eventDesc').value='';
+      document.getElementById('eventStatus').value='active';
+      document.getElementById('eventTag').value='event';
+      document.getElementById('eventStart').value='';
+      document.getElementById('eventEnd').value='';
+      document.getElementById('eventColor').value='linear-gradient(90deg,#3b82f6,#60a5fa)';
+      document.getElementById('rewardsEditor').innerHTML='';
+      addRewardField();
+      document.getElementById('eventFormOverlay').style.display='flex';
+      document.body.style.overflow='hidden';
+    }
+    function editEvent(id){
+      var ev=allEvents.find(e=>e.id===id);if(!ev)return;
+      editingEventId=id;
+      document.getElementById('eventFormTitle').textContent='Edit: '+ev.title;
+      document.getElementById('editEventId').value=id;
+      document.getElementById('eventTitle').value=ev.title||'';
+      document.getElementById('eventDesc').value=ev.desc||'';
+      document.getElementById('eventStatus').value=ev.status||'active';
+      document.getElementById('eventTag').value=ev.tag||'event';
+      document.getElementById('eventStart').value=ev.start||'';
+      document.getElementById('eventEnd').value=ev.end||'';
+      document.getElementById('eventColor').value=ev.color||'linear-gradient(90deg,#3b82f6,#60a5fa)';
+      var rh='';(ev.rewards||[]).forEach(r=>{rh+='<div class="costume-item-cms"><input type="text" class="reward-input" value="'+r.replace(/"/g,'&quot;')+'" placeholder="Reward"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button></div>'});
+      document.getElementById('rewardsEditor').innerHTML=rh;
+      document.getElementById('eventFormOverlay').style.display='flex';
+      document.body.style.overflow='hidden';
+    }
+    function hideEventForm(){document.getElementById('eventFormOverlay').style.display='none';document.body.style.overflow=''}
+    function closeEventFormOverlay(e){if(e.target.id==='eventFormOverlay')hideEventForm()}
+    function addRewardField(){
+      var d=document.createElement('div');d.className='costume-item-cms';
+      d.innerHTML='<input type="text" class="reward-input" placeholder="e.g. Gems x500"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
+      document.getElementById('rewardsEditor').appendChild(d);
+    }
+    function saveEvent(){
+      var t=document.getElementById('eventTitle').value.trim();if(!t){alert('Title required');return}
+      var rewards=[];document.querySelectorAll('.reward-input').forEach(i=>{if(i.value.trim())rewards.push(i.value.trim())});
+      var d={title:t,desc:document.getElementById('eventDesc').value,status:document.getElementById('eventStatus').value,tag:document.getElementById('eventTag').value,start:document.getElementById('eventStart').value,end:document.getElementById('eventEnd').value,color:document.getElementById('eventColor').value,rewards:rewards};
+      if(editingEventId){var idx=allEvents.findIndex(e=>e.id===editingEventId);if(idx!==-1){d.id=editingEventId;allEvents[idx]=d}}else{d.id=Date.now();allEvents.push(d)}
+      saveEventsToStorage();renderEventDashboard();hideEventForm();showNotification('Event "'+t+'" saved!','success');
+    }
+    function deleteEvent(id){
+      var ev=allEvents.find(e=>e.id===id);if(!ev)return;
+      if(!confirm('Delete "'+ev.title+'"?'))return;
+      allEvents=allEvents.filter(e=>e.id!==id);saveEventsToStorage();renderEventDashboard();showNotification('Event deleted','success');
     }
 
-    // ---- Form Management ----
-    function showAddForm() {
-      editingId = null;
-      document.getElementById('formTitle').textContent = 'Add New Character';
-      document.getElementById('editId').value = '';
-      document.getElementById('charName').value = '';
-      document.getElementById('charRarity').value = 'SSR';
-      document.getElementById('charTier').value = 'B';
-      document.getElementById('charSlug').value = '';
-      document.getElementById('charDesc').value = '';
-      tempImageFile = null;
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('imagePrompt').style.display = '';
-      tempSkills = {};
-      tempPotentials = {};
-      buildWeaponCheckboxes([]);
-      document.getElementById('skillsEditor').innerHTML = '';
-      document.getElementById('potentialsEditor').innerHTML = '';
-      document.getElementById('costumesEditor').innerHTML = '';
-      document.getElementById('weaponSkillsTabs').innerHTML = '';
-      document.getElementById('weaponPotentialsTabs').innerHTML = '';
-      document.getElementById('formOverlay').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+    /* ── Character Form ── */
+    function scrollToSection(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+    function showAddForm(){
+      editingId=null;
+      document.getElementById('formTitle').textContent='Add New Character';
+      document.getElementById('editId').value='';
+      document.getElementById('charName').value='';
+      document.getElementById('charRarity').value='SSR';
+      document.getElementById('charTier').value='B';
+      document.getElementById('charSlug').value='';
+      document.getElementById('charDesc').value='';
+      tempImageFile=null;
+      document.getElementById('previewImg').style.display='none';
+      document.getElementById('imagePrompt').style.display='';
+      tempSkills={};tempPotentials={};
+      buildWeaponToggles([]);
+      document.getElementById('skillsEditor').innerHTML='';
+      document.getElementById('potentialsEditor').innerHTML='';
+      document.getElementById('costumesEditor').innerHTML='';
+      document.getElementById('weaponSkillsTabs').innerHTML='';
+      document.getElementById('weaponPotentialsTabs').innerHTML='';
+      document.getElementById('formOverlay').style.display='flex';
+      document.body.style.overflow='hidden';
     }
+    function editCharacter(id){
+      var c=allCharacters.find(ch=>ch.id===id);if(!c)return;
+      editingId=id;
+      document.getElementById('formTitle').textContent='Edit: '+c.name;
+      document.getElementById('editId').value=id;
+      document.getElementById('charName').value=c.name||'';
+      document.getElementById('charRarity').value=c.rarity||'SSR';
+      document.getElementById('charTier').value=c.tier||'B';
+      document.getElementById('charSlug').value=c.slug||'';
+      document.getElementById('charDesc').value=c.description||'';
+      tempImageFile=null;
+      if(c.image){document.getElementById('previewImg').src=c.image;document.getElementById('previewImg').style.display='';document.getElementById('imagePrompt').style.display='none'}
+      else{document.getElementById('previewImg').style.display='none';document.getElementById('imagePrompt').style.display=''}
+      tempSkills=JSON.parse(JSON.stringify(c.skills||{}));
+      tempPotentials=JSON.parse(JSON.stringify(c.potentials||{}));
+      buildWeaponToggles(c.types||[]);
+      updateSkillsTabs();updatePotentialsTabs();
+      var ch='';(c.costumes||[]).forEach(cos=>{var n=(typeof cos==='string')?cos:(cos.name||'');ch+='<div class="costume-item-cms"><input type="text" class="costume-input" value="'+n.replace(/"/g,'&quot;')+'" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button></div>'});
+      document.getElementById('costumesEditor').innerHTML=ch;
+      document.getElementById('formOverlay').style.display='flex';
+      document.body.style.overflow='hidden';
+    }
+    function hideForm(){document.getElementById('formOverlay').style.display='none';document.body.style.overflow=''}
+    function closeFormOverlay(e){if(e.target.id==='formOverlay')hideForm()}
 
-    function editCharacter(id) {
-      var c = allCharacters.find(function(ch) { return ch.id === id; });
-      if (!c) return;
-      editingId = id;
-      document.getElementById('formTitle').textContent = 'Edit: ' + c.name;
-      document.getElementById('editId').value = id;
-      document.getElementById('charName').value = c.name || '';
-      document.getElementById('charRarity').value = c.rarity || 'SSR';
-      document.getElementById('charTier').value = c.tier || 'B';
-      document.getElementById('charSlug').value = c.slug || (c.name ? c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : '');
-      document.getElementById('charDesc').value = c.description || '';
+    /* ── Weapon Toggles ── */
+    function buildWeaponToggles(sel){
+      var c=document.getElementById('weaponToggles'),h='';
+      ALL_WEAPONS.forEach(w=>{var s=sel.indexOf(w)!==-1?' selected':'';h+='<div class="weapon-toggle'+s+'" onclick="toggleWeapon(this,\''+w+'\')">'+w+'</div>'});
+      c.innerHTML=h;
+    }
+    function toggleWeapon(el){el.classList.toggle('selected');updateSkillsTabs();updatePotentialsTabs()}
+    function getSelectedWeapons(){var s=[];document.querySelectorAll('.weapon-toggle.selected').forEach(el=>{s.push(el.textContent.trim())});return s}
 
-      // Image
-      tempImageFile = null;
-      if (c.image) {
-        document.getElementById('previewImg').src = c.image;
-        document.getElementById('imagePreview').style.display = '';
-        document.getElementById('imagePrompt').style.display = 'none';
-      } else {
-        document.getElementById('imagePreview').style.display = 'none';
-        document.getElementById('imagePrompt').style.display = '';
-      }
-
-      // Deep copy skills and potentials
-      tempSkills = JSON.parse(JSON.stringify(c.skills || {}));
-      tempPotentials = JSON.parse(JSON.stringify(c.potentials || {}));
-
-      buildWeaponCheckboxes(c.types || []);
-      updateSkillsTabs();
-      updatePotentialsTabs();
-
-      // Costumes
-      var costumesHtml = '';
-      (c.costumes || []).forEach(function(cos) {
-        var name = (typeof cos === 'string') ? cos : (cos.name || '');
-        costumesHtml += '<div class="costume-input-row"><input type="text" class="costume-input" value="' + name.replace(/"/g, '&quot;') + '" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button></div>';
+    function updateSkillsTabs(){
+      var sel=getSelectedWeapons(),c=document.getElementById('weaponSkillsTabs'),h='';
+      sel.forEach(w=>{var a=(w===currentSkillWeapon)?' active':'';h+='<button class="weapon-tab-btn'+a+'" onclick="showSkillEditor(\''+w+'\')">'+w+'</button>'});
+      c.innerHTML=h;
+      if(sel.length>0){if(!currentSkillWeapon||sel.indexOf(currentSkillWeapon)===-1)showSkillEditor(sel[0]);else showSkillEditor(currentSkillWeapon)}
+      else document.getElementById('skillsEditor').innerHTML='<p class="form-hint">Select a weapon type first</p>';
+    }
+    function showSkillEditor(weapon){
+      currentSkillWeapon=weapon;
+      document.querySelectorAll('#weaponSkillsTabs .weapon-tab-btn').forEach(t=>{t.classList.toggle('active',t.textContent===weapon)});
+      var skills=tempSkills[weapon]||[];
+      if(skills.length===0){skills=[{name:'Normal Attack',type:'Normal Attack',description:''},{name:'Skill 1',type:'Skill',description:''},{name:'Skill 2',type:'Skill',description:''},{name:'Ultimate',type:'Ultimate',description:''}];tempSkills[weapon]=skills}
+      var h='';
+      skills.forEach((sk,i)=>{
+        h+='<div class="skill-expand-card"><div class="skill-expand-header" onclick="toggleSkillCard(this)"><span class="skill-title">'+(sk.name||'Skill '+(i+1))+'</span><span class="skill-type-tag">'+(sk.type||'Skill')+'</span><span class="expand-arrow open">&#9660;</span></div>';
+        h+='<div class="skill-expand-body open">';
+        h+='<div class="form-group"><label>Skill Name</label><input type="text" value="'+(sk.name||'').replace(/"/g,'&quot;')+'" oninput="updateTempSkill('+i+',\'name\',this.value);this.closest(\'.skill-expand-card\').querySelector(\'.skill-title\').textContent=this.value||\'Skill\'"></div>';
+        h+='<div class="form-group"><label>Type</label><select onchange="updateTempSkill('+i+',\'type\',this.value);this.closest(\'.skill-expand-card\').querySelector(\'.skill-type-tag\').textContent=this.value">';
+        SKILL_TYPES.forEach(t=>{h+='<option value="'+t+'" '+(sk.type===t?'selected':'')+'>'+t+'</option>'});
+        h+='</select></div>';
+        h+='<div class="form-group"><label>Description</label><textarea rows="2" oninput="updateTempSkill('+i+',\'description\',this.value)">'+(sk.description||'')+'</textarea></div>';
+        h+='<div style="text-align:right;"><button class="btn-remove-item" onclick="removeTempSkill('+i+')" style="width:auto;padding:4px 12px;font-size:12px;">Remove</button></div>';
+        h+='</div></div>';
       });
-      document.getElementById('costumesEditor').innerHTML = costumesHtml;
-      document.getElementById('formOverlay').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      h+='<button type="button" class="btn-add-item" onclick="addTempSkill()">+ Add Skill</button>';
+      document.getElementById('skillsEditor').innerHTML=h;
     }
+    function toggleSkillCard(header){header.nextElementSibling.classList.toggle('open');header.querySelector('.expand-arrow').classList.toggle('open')}
+    function updateTempSkill(idx,field,val){if(!tempSkills[currentSkillWeapon])tempSkills[currentSkillWeapon]=[];tempSkills[currentSkillWeapon][idx][field]=val}
+    function addTempSkill(){if(!tempSkills[currentSkillWeapon])tempSkills[currentSkillWeapon]=[];tempSkills[currentSkillWeapon].push({name:'',type:'Skill',description:''});showSkillEditor(currentSkillWeapon)}
+    function removeTempSkill(idx){tempSkills[currentSkillWeapon].splice(idx,1);showSkillEditor(currentSkillWeapon)}
 
-    function hideForm() {
-      document.getElementById('formOverlay').style.display = 'none';
-      document.body.style.overflow = '';
+    function updatePotentialsTabs(){
+      var sel=getSelectedWeapons(),c=document.getElementById('weaponPotentialsTabs'),h='';
+      sel.forEach(w=>{var a=(w===currentPotWeapon)?' active':'';h+='<button class="weapon-tab-btn'+a+'" onclick="showPotentialsEditor(\''+w+'\')">'+w+'</button>'});
+      c.innerHTML=h;
+      if(sel.length>0){if(!currentPotWeapon||sel.indexOf(currentPotWeapon)===-1)showPotentialsEditor(sel[0]);else showPotentialsEditor(currentPotWeapon)}
+      else document.getElementById('potentialsEditor').innerHTML='<p class="form-hint">Select a weapon type first</p>';
     }
-
-    function closeFormOverlay(e) {
-      if (e.target.id === 'formOverlay') hideForm();
+    function showPotentialsEditor(weapon){
+      currentPotWeapon=weapon;
+      document.querySelectorAll('#weaponPotentialsTabs .weapon-tab-btn').forEach(t=>{t.classList.toggle('active',t.textContent===weapon)});
+      var pots=tempPotentials[weapon]||[];
+      if(pots.length===0){for(var i=1;i<=10;i++)pots.push({tier:'Tier '+i,description:''});tempPotentials[weapon]=pots}
+      var h='<div class="potentials-grid-cms">';
+      pots.forEach((p,i)=>{h+='<div class="pot-card-cms"><label>Tier '+(i+1)+'</label><textarea rows="2" placeholder="Bonus effect..." oninput="updateTempPot('+i+',this.value)">'+(p.description||'')+'</textarea></div>'});
+      h+='</div>';
+      document.getElementById('potentialsEditor').innerHTML=h;
     }
+    function updateTempPot(idx,val){tempPotentials[currentPotWeapon][idx].description=val}
+    function addCostumeField(){var d=document.createElement('div');d.className='costume-item-cms';d.innerHTML='<input type="text" class="costume-input" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';document.getElementById('costumesEditor').appendChild(d)}
 
-    // ---- Form Helpers ----
-    function buildWeaponCheckboxes(selected) {
-      var container = document.getElementById('weaponCheckboxes');
-      var html = '';
-      ALL_WEAPONS.forEach(function(w) {
-        var checked = selected.indexOf(w) !== -1 ? 'checked' : '';
-        html += '<label class="weapon-checkbox"><input type="checkbox" value="' + w + '" ' + checked + ' onchange="onWeaponChange()"> ' + w + '</label>';
-      });
-      container.innerHTML = html;
-    }
-
-    function onWeaponChange() {
-      var selected = [];
-      document.querySelectorAll('#weaponCheckboxes input:checked').forEach(function(cb) { selected.push(cb.value); });
-      
-      // Update tabs
-      updateSkillsTabs();
-      updatePotentialsTabs();
-    }
-
-    function updateSkillsTabs() {
-      var selected = [];
-      document.querySelectorAll('#weaponCheckboxes input:checked').forEach(function(cb) { selected.push(cb.value); });
-      
-      var container = document.getElementById('weaponSkillsTabs');
-      var html = '';
-      selected.forEach(function(w) {
-        var active = (w === currentSkillWeapon) ? 'active' : '';
-        html += '<button class="weapon-tab ' + active + '" onclick="showSkillEditor(\'' + w + '\')">' + w + '</button>';
-      });
-      container.innerHTML = html;
-
-      if (selected.length > 0) {
-        if (!currentSkillWeapon || selected.indexOf(currentSkillWeapon) === -1) {
-          showSkillEditor(selected[0]);
-        } else {
-          showSkillEditor(currentSkillWeapon);
-        }
-      } else {
-        document.getElementById('skillsEditor').innerHTML = '<p class="form-hint">Select a weapon type first</p>';
-      }
-    }
-
-    function showSkillEditor(weapon) {
-      currentSkillWeapon = weapon;
-      document.querySelectorAll('#weaponSkillsTabs .weapon-tab').forEach(function(t) {
-        t.classList.toggle('active', t.textContent === weapon);
-      });
-
-      var skills = tempSkills[weapon] || [];
-      // Ensure basic skills exist
-      if (skills.length === 0) {
-        skills = [
-          { name: 'Normal Attack', type: 'Normal Attack', description: '' },
-          { name: 'Skill 1', type: 'Skill', description: '' },
-          { name: 'Skill 2', type: 'Skill', description: '' },
-          { name: 'Ultimate', type: 'Ultimate', description: '' }
-        ];
-        tempSkills[weapon] = skills;
-      }
-
-      var html = '';
-      skills.forEach(function(sk, i) {
-        html += '<div class="skill-input-group">';
-        html += '<div class="form-row">';
-        html += '<div class="form-group"><label>Skill Name</label><input type="text" value="' + (sk.name||'').replace(/"/g,'&quot;') + '" oninput="updateTempSkill(' + i + ',\'name\',this.value)"></div>';
-        html += '<div class="form-group"><label>Type</label><select onchange="updateTempSkill(' + i + ',\'type\',this.value)">';
-        SKILL_TYPES.forEach(function(t) {
-          var sel = (sk.type === t) ? 'selected' : '';
-          html += '<option value="' + t + '" ' + sel + '>' + t + '</option>';
-        });
-        html += '</select></div>';
-        html += '</div>';
-        html += '<div class="form-group"><label>Description</label><textarea rows="2" oninput="updateTempSkill(' + i + ',\'description\',this.value)">' + (sk.description||'') + '</textarea></div>';
-        html += '<button class="btn-remove-item" onclick="removeTempSkill(' + i + ')">Remove Skill</button>';
-        html += '</div>';
-      });
-      html += '<button type="button" class="btn-add-item" onclick="addTempSkill()">+ Add Skill</button>';
-      document.getElementById('skillsEditor').innerHTML = html;
-    }
-
-    function updateTempSkill(idx, field, val) {
-      if (!tempSkills[currentSkillWeapon]) tempSkills[currentSkillWeapon] = [];
-      tempSkills[currentSkillWeapon][idx][field] = val;
-    }
-
-    function addTempSkill() {
-      if (!tempSkills[currentSkillWeapon]) tempSkills[currentSkillWeapon] = [];
-      tempSkills[currentSkillWeapon].push({ name: '', type: 'Skill', description: '' });
-      showSkillEditor(currentSkillWeapon);
-    }
-
-    function removeTempSkill(idx) {
-      tempSkills[currentSkillWeapon].splice(idx, 1);
-      showSkillEditor(currentSkillWeapon);
-    }
-
-    function updatePotentialsTabs() {
-      var selected = [];
-      document.querySelectorAll('#weaponCheckboxes input:checked').forEach(function(cb) { selected.push(cb.value); });
-      
-      var container = document.getElementById('weaponPotentialsTabs');
-      var html = '';
-      selected.forEach(function(w) {
-        var active = (w === currentPotWeapon) ? 'active' : '';
-        html += '<button class="weapon-tab ' + active + '" onclick="showPotentialsEditor(\'' + w + '\')">' + w + '</button>';
-      });
-      container.innerHTML = html;
-
-      if (selected.length > 0) {
-        if (!currentPotWeapon || selected.indexOf(currentPotWeapon) === -1) {
-          showPotentialsEditor(selected[0]);
-        } else {
-          showPotentialsEditor(currentPotWeapon);
-        }
-      } else {
-        document.getElementById('potentialsEditor').innerHTML = '<p class="form-hint">Select a weapon type first</p>';
-      }
-    }
-
-    function showPotentialsEditor(weapon) {
-      currentPotWeapon = weapon;
-      document.querySelectorAll('#weaponPotentialsTabs .weapon-tab').forEach(function(t) {
-        t.classList.toggle('active', t.textContent === weapon);
-      });
-
-      var pots = tempPotentials[weapon] || [];
-      if (pots.length === 0) {
-        for (var i = 1; i <= 10; i++) pots.push({ tier: 'Tier ' + i, description: '' });
-        tempPotentials[weapon] = pots;
-      }
-
-      var html = '<div class="potentials-input-grid">';
-      pots.forEach(function(p, i) {
-        html += '<div class="pot-input-group">';
-        html += '<label>Tier ' + (i+1) + '</label>';
-        html += '<textarea rows="2" placeholder="Bonus effect..." oninput="updateTempPot(' + i + ',this.value)">' + (p.description||'') + '</textarea>';
-        html += '</div>';
-      });
-      html += '</div>';
-      document.getElementById('potentialsEditor').innerHTML = html;
-    }
-
-    function updateTempPot(idx, val) {
-      tempPotentials[currentPotWeapon][idx].description = val;
-    }
-
-    function addCostumeField() {
-      var div = document.createElement('div');
-      div.className = 'costume-input-row';
-      div.innerHTML = '<input type="text" class="costume-input" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
-      document.getElementById('costumesEditor').appendChild(div);
-    }
-
-    // ---- Image Upload ----
-    function handleImageUpload(input) {
-      if (input.files && input.files[0]) {
-        tempImageFile = input.files[0];
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('previewImg').src = e.target.result;
-          document.getElementById('imagePreview').style.display = '';
-          document.getElementById('imagePrompt').style.display = 'none';
-        };
+    function handleImageUpload(input){
+      if(input.files&&input.files[0]){
+        tempImageFile=input.files[0];
+        var reader=new FileReader();
+        reader.onload=function(e){document.getElementById('previewImg').src=e.target.result;document.getElementById('previewImg').style.display='';document.getElementById('imagePrompt').style.display='none'};
         reader.readAsDataURL(tempImageFile);
       }
     }
 
-    // ---- Actions ----
-    async function saveCharacter() {
-      var name = document.getElementById('charName').value.trim();
-      if (!name) { alert('Name is required'); return; }
-
-      var saveBtn = document.getElementById('saveBtn');
-      var saveBtnText = document.getElementById('saveBtnText');
-      var saveBtnLoading = document.getElementById('saveBtnLoading');
-
-      saveBtn.disabled = true;
-      saveBtnText.style.display = 'none';
-      saveBtnLoading.style.display = 'inline';
-
-      try {
-        var selectedTypes = [];
-        document.querySelectorAll('#weaponCheckboxes input:checked').forEach(function(cb) { selectedTypes.push(cb.value); });
-
-        var costumes = [];
-        document.querySelectorAll('.costume-input').forEach(function(input) {
-          if (input.value.trim()) costumes.push(input.value.trim());
-        });
-
-        // Clean up skills/potentials for unselected weapons
-        var finalSkills = {};
-        var finalPotentials = {};
-        selectedTypes.forEach(function(w) {
-          if (tempSkills[w]) finalSkills[w] = tempSkills[w];
-          if (tempPotentials[w]) finalPotentials[w] = tempPotentials[w];
-        });
-
-        var slug = document.getElementById('charSlug').value.trim();
-        if (!slug) {
-          slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        }
-        
-        var charData = {
-          name: name,
-          rarity: document.getElementById('charRarity').value,
-          tier: document.getElementById('charTier').value,
-          slug: slug,
-          description: document.getElementById('charDesc').value,
-          types: selectedTypes,
-          skills: finalSkills,
-          potentials: finalPotentials,
-          costumes: costumes
-        };
-
-        // Upload image if changed
-        if (tempImageFile) {
-          try {
-            var upload = await SupaDB.uploadImage(tempImageFile, slug);
-            if (upload.error) throw upload.error;
-            charData.image = upload.url;
-          } catch (uploadErr) {
-            console.warn('[Save] Image upload failed, falling back to name-based path:', uploadErr);
-            showNotification('Image upload failed (Storage RLS). Using local path instead.', 'info');
-            charData.image = 'images/' + name + '.png'; // Fallback
-          }
-        } else if (editingId) {
-          // Keep existing image
-          var existing = allCharacters.find(function(c){ return c.id === editingId; });
-          if (existing) charData.image = existing.image;
-        }
-
-        var result;
-        if (editingId) {
-          result = await CharDB.update(editingId, charData);
-        } else {
-          result = await CharDB.add(charData);
-        }
-
-        if (result.error) throw result.error;
-
-        showNotification('Character "' + name + '" saved successfully!', 'success');
-        hideForm();
-      } catch (err) {
-        console.error('[Save] Error:', err);
-        let errorMsg = err.message;
-        if (errorMsg.includes('row-level security')) {
-          errorMsg = "Database access denied (RLS Policy). Please check your Supabase permissions.";
-        }
-        showNotification('Failed to save: ' + errorMsg, 'error');
-      } finally {
-        saveBtn.disabled = false;
-        saveBtnText.style.display = 'inline';
-        saveBtnLoading.style.display = 'none';
-      }
+    async function saveCharacter(){
+      var name=document.getElementById('charName').value.trim();if(!name){alert('Name required');return}
+      var saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;
+      document.getElementById('saveBtnText').style.display='none';document.getElementById('saveBtnLoading').style.display='inline';
+      try{
+        var selectedTypes=getSelectedWeapons(),costumes=[];
+        document.querySelectorAll('.costume-input').forEach(i=>{if(i.value.trim())costumes.push(i.value.trim())});
+        var finalSkills={},finalPotentials={};
+        selectedTypes.forEach(w=>{if(tempSkills[w])finalSkills[w]=tempSkills[w];if(tempPotentials[w])finalPotentials[w]=tempPotentials[w]});
+        var slug=document.getElementById('charSlug').value.trim();
+        if(!slug)slug=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+        var charData={name:name,rarity:document.getElementById('charRarity').value,tier:document.getElementById('charTier').value,slug:slug,description:document.getElementById('charDesc').value,types:selectedTypes,skills:finalSkills,potentials:finalPotentials,costumes:costumes};
+        if(tempImageFile){try{var upload=await SupaDB.uploadImage(tempImageFile,slug);if(upload.error)throw upload.error;charData.image=upload.url}catch(ue){charData.image='images/'+name+'.png'}}
+        else if(editingId){var ex=allCharacters.find(c=>c.id===editingId);if(ex)charData.image=ex.image}
+        var result;if(editingId)result=await CharDB.update(editingId,charData);else result=await CharDB.add(charData);
+        if(result.error)throw result.error;
+        showNotification('"'+name+'" saved!','success');hideForm();
+      }catch(err){showNotification('Failed: '+err.message,'error')}
+      finally{saveBtn.disabled=false;document.getElementById('saveBtnText').style.display='inline';document.getElementById('saveBtnLoading').style.display='none'}
     }
-
-    async function deleteCharacter(id, name) {
-      if (!confirm('Are you sure you want to delete ' + name + '?')) return;
-      
-      try {
-        var result = await CharDB.remove(id);
-        if (result.error) throw result.error;
-        showNotification('Character deleted successfully', 'success');
-      } catch (err) {
-        console.error("[Delete] Error:", err);
-        showNotification('Delete failed: ' + err.message, 'error');
-      }
+    async function deleteCharacter(id,name){
+      if(!confirm('Delete '+name+'?'))return;
+      try{var r=await CharDB.remove(id);if(r.error)throw r.error;showNotification('Deleted','success')}catch(e){showNotification('Failed: '+e.message,'error')}
     }
-
-    function doExport() {
-      CharDB.exportJSON(allCharacters);
-    }
-
-    async function importTierList() {
-      try {
-        showNotification('Fetching tier list...', 'info');
-        const response = await fetch("https://7dsorigin.gg/tier-list");
-        if (!response.ok) throw new Error("Failed to fetch tier list");
-        const html = await response.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-
-        const characters = [];
-
-        doc.querySelectorAll(".tierlist-character").forEach(el => {
-          const name = el.querySelector(".character-name")?.innerText || "";
-          const image = el.querySelector("img")?.src || "";
-          const tier = el.closest(".tier-row")?.dataset.tier || "B";
-
-          characters.push({
-            name: name,
-            rarity: "SSR",
-            description: "",
-            image: image,
-            tier: tier,
-            types: [],
-            skills: {},
-            potentials: {},
-            costumes: []
-          });
-        });
-
-        if (characters.length === 0) {
-          alert("No characters found on tier list");
-          return;
-        }
-
-        if (confirm('Import ' + characters.length + ' characters from tier list?')) {
-          showNotification('Importing...', 'info');
-          const result = await SupaDB.bulkImport(characters);
-
-          if (result.error) {
-            console.error("[Import] Tier list error:", result.error);
-            showNotification("Tier list import failed: " + result.error.message, "error");
-          } else {
-            console.log("[Import] Tier list success:", result.data.length, "characters");
-            showNotification("Imported " + result.data.length + " characters successfully!", "success");
-            setTimeout(() => location.reload(), 1500);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Failed to fetch tier list: " + err.message);
-      }
-    }
-
-    function handleImport(event) {
-      var file = event.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          var data = JSON.parse(e.target.result);
-          if (!Array.isArray(data)) {
-            alert('Invalid JSON format. Expected an array of characters.');
-            return;
-          }
-          var result = await SupaDB.bulkImport(data);
-          if (result.error) {
-            console.error("[Import] JSON error:", result.error);
-            showNotification("JSON Import failed: " + result.error.message, "error");
-          } else {
-            console.log("[Import] JSON success:", result.data.length, "characters");
-            showNotification("JSON Imported " + result.data.length + " characters successfully!", "success");
-            setTimeout(() => location.reload(), 1500);
-          }
-        } catch (err) {
-          console.error(err);
-          alert('JSON parsing error.');
-        }
-      };
+    function doExport(){CharDB.exportJSON(allCharacters)}
+    function handleImport(event){
+      var file=event.target.files[0];if(!file)return;
+      var reader=new FileReader();
+      reader.onload=async function(e){try{var data=JSON.parse(e.target.result);if(!Array.isArray(data)){alert('Invalid JSON');return}var r=await SupaDB.bulkImport(data);if(r.error)showNotification('Import failed','error');else{showNotification('Imported '+r.data.length+' characters!','success');setTimeout(()=>location.reload(),1500)}}catch(err){alert('JSON error')}};
       reader.readAsText(file);
     }
 
-    function showNotification(msg, type) {
-      console.log(`[Notification] [${type.toUpperCase()}] ${msg}`);
-      var n = document.createElement('div');
-      n.style.position = 'fixed';
-      n.style.bottom = '20px';
-      n.style.right = '20px';
-      n.style.padding = '12px 24px';
-      n.style.borderRadius = '8px';
-      n.style.color = 'white';
-      n.style.zIndex = '10000';
-      n.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      n.style.fontFamily = 'sans-serif';
-      n.style.fontSize = '14px';
-      n.style.animation = 'slideIn 0.3s ease-out';
-      
-      if (type === 'success') {
-        n.style.backgroundColor = '#16a34a';
-        n.innerHTML = '✅ ' + msg;
-      } else if (type === 'info') {
-        n.style.backgroundColor = '#3b82f6';
-        n.innerHTML = 'ℹ️ ' + msg;
-      } else {
-        n.style.backgroundColor = '#ef4444';
-        n.innerHTML = '❌ ' + msg;
-      }
-      
+    function showNotification(msg,type){
+      var n=document.createElement('div');
+      n.style.cssText='position:fixed;bottom:20px;right:20px;padding:12px 24px;border-radius:8px;color:white;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,.3);font-family:sans-serif;font-size:14px;animation:slideIn .3s ease-out;';
+      if(type==='success'){n.style.backgroundColor='#16a34a';n.innerHTML='&#9989; '+msg}
+      else if(type==='info'){n.style.backgroundColor='#3b82f6';n.innerHTML='&#8505; '+msg}
+      else{n.style.backgroundColor='#ef4444';n.innerHTML='&#10060; '+msg}
       document.body.appendChild(n);
-      
-      setTimeout(function() {
-        n.style.opacity = '0';
-        n.style.transition = 'opacity 0.5s';
-        setTimeout(function() { n.remove(); }, 500);
-      }, 3000);
+      setTimeout(()=>{n.style.opacity='0';n.style.transition='opacity .5s';setTimeout(()=>n.remove(),500)},3000);
     }
   </script>
-  <style>
-    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-  </style>
 </body>
 </html>
