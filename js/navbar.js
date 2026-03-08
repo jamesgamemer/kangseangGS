@@ -1,12 +1,16 @@
 /* ============================================================
-   Navbar - Hamburger toggle + Active link + Login/Admin button
+   Navbar - Hamburger toggle + Active link + Language Switcher
+   + Google-style Admin Profile Menu + Login Button
+   Global i18n integration: all nav text uses data-i18n
    ============================================================ */
 function initNavbar() {
-  /* Prevent double init */
   if (window._navbarInitDone) return;
   window._navbarInitDone = true;
 
-  /* Hamburger toggle */
+  /* ── Apply i18n to existing nav links ── */
+  applyNavI18n();
+
+  /* ── Hamburger toggle ── */
   var ham = document.getElementById('navHam');
   var links = document.getElementById('navLinks');
   if (ham && links) {
@@ -15,7 +19,7 @@ function initNavbar() {
     });
   }
 
-  /* Highlight active link */
+  /* ── Highlight active link ── */
   var current = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.navbar-links a').forEach(function (a) {
     var href = a.getAttribute('href');
@@ -25,41 +29,164 @@ function initNavbar() {
     }
   });
 
-  /* Inject Login / Admin button into navbar */
+  /* ── Language Switcher ── */
   var navLinks = document.getElementById('navLinks');
-  if (navLinks && !navLinks.querySelector('.nav-auth-item')) {
-    var li = document.createElement('li');
-    li.className = 'nav-auth-item';
+  if (navLinks && !navLinks.querySelector('.nav-lang-switcher')) {
+    var langLi = document.createElement('li');
+    langLi.className = 'nav-lang-switcher';
+    var currentLang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'en';
+    langLi.innerHTML =
+      '<div class="lang-switch-group">' +
+        '<button class="lang-btn' + (currentLang === 'en' ? ' active' : '') + '" data-lang="en">EN</button>' +
+        '<span class="lang-divider">|</span>' +
+        '<button class="lang-btn' + (currentLang === 'th' ? ' active' : '') + '" data-lang="th">TH</button>' +
+      '</div>';
+    navLinks.appendChild(langLi);
 
-    var isAdmin = (typeof Auth !== 'undefined') && Auth.isLoggedIn();
+    /* Attach click events to language buttons */
+    langLi.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchLang(btn.dataset.lang);
+      });
+    });
+  }
 
-    if (isAdmin) {
-      li.innerHTML =
-        '<div class="nav-auth-group">' +
-          '<a href="admin.html" class="nav-admin-btn" title="Admin Dashboard">' +
-            '<span class="nav-admin-icon">\u2699</span> Admin' +
-          '</a>' +
-          '<button class="nav-logout-btn" title="Logout" id="navLogoutBtn">' +
-            '\u2715' +
-          '</button>' +
-        '</div>';
-    } else {
-      li.innerHTML =
-        '<a href="login.html" class="nav-login-btn" title="Admin Login">' +
-          '<span class="nav-login-icon">\uD83D\uDD12</span> Login' +
-        '</a>';
+  /* ── Auth: Google-style Profile Menu or Login Button ── */
+  injectAuthUI();
+
+  /* ── Listen for language changes to update navbar text ── */
+  if (typeof I18n !== 'undefined') {
+    I18n.onChange(function() {
+      applyNavI18n();
+    });
+  }
+}
+
+function applyNavI18n() {
+  if (typeof I18n === 'undefined') return;
+
+  /* Update nav links text */
+  var navMap = {
+    'index.html': { icon: '&#127968;', key: 'nav_home' },
+    'characters.html': { icon: '&#9876;', key: 'nav_characters' },
+    'tierlist.html': { icon: '&#127942;', key: 'nav_tierlist' },
+    'events.html': { icon: '&#127881;', key: 'nav_events' }
+  };
+
+  document.querySelectorAll('.navbar-links > li > a').forEach(function(a) {
+    var href = a.getAttribute('href');
+    if (!href) return;
+    var page = href.split('/').pop();
+    var mapping = navMap[page];
+    if (mapping) {
+      a.innerHTML = mapping.icon + ' <span class="nav-text">' + I18n.t(mapping.key).toUpperCase() + '</span>';
     }
+  });
+
+  /* Update login button text if present */
+  var loginBtn = document.querySelector('.nav-login-btn');
+  if (loginBtn) {
+    loginBtn.innerHTML = '<span class="nav-login-icon">&#128274;</span> ' + I18n.t('nav_login');
+  }
+
+  /* Update profile menu items if present */
+  document.querySelectorAll('.profile-menu-item[data-i18n-key]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-key');
+    var icon = el.querySelector('.pmi-icon');
+    var iconHtml = icon ? icon.outerHTML + ' ' : '';
+    el.innerHTML = iconHtml + I18n.t(key);
+  });
+
+  /* Update footer */
+  var footerText = document.querySelector('[data-i18n="footer_text"]');
+  if (footerText) footerText.textContent = I18n.t('footer_text');
+}
+
+async function injectAuthUI() {
+  var navLinks = document.getElementById('navLinks');
+  if (!navLinks || navLinks.querySelector('.nav-auth-item')) return;
+
+  var li = document.createElement('li');
+  li.className = 'nav-auth-item';
+
+  var isAdmin = false;
+  var userEmail = '';
+  if (typeof Auth !== 'undefined') {
+    try {
+      isAdmin = await Auth.isLoggedIn();
+      if (isAdmin && typeof SupaDB !== 'undefined') {
+        var session = await SupaDB.getSession();
+        if (session && session.user) userEmail = session.user.email || '';
+      }
+    } catch(e) {}
+  }
+
+  if (isAdmin) {
+    var initial = userEmail ? userEmail.charAt(0).toUpperCase() : 'A';
+    var t = function(k) { return (typeof I18n !== 'undefined') ? I18n.t(k) : k; };
+    li.innerHTML =
+      '<div class="nav-profile-wrapper">' +
+        '<button class="nav-profile-avatar" id="profileAvatarBtn" title="Admin Menu">' + initial + '</button>' +
+        '<div class="nav-profile-menu" id="profileMenu">' +
+          '<div class="profile-menu-header">' +
+            '<div class="profile-menu-avatar">' + initial + '</div>' +
+            '<div class="profile-menu-info">' +
+              '<div class="profile-menu-role">Admin</div>' +
+              '<div class="profile-menu-email">' + escNavHtml(userEmail) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="profile-menu-divider"></div>' +
+          '<a href="admin.html" class="profile-menu-item" data-i18n-key="menu_dashboard"><span class="pmi-icon">&#128200;</span> ' + t('menu_dashboard') + '</a>' +
+          '<a href="characters.html" class="profile-menu-item" data-i18n-key="menu_characters"><span class="pmi-icon">&#9876;</span> ' + t('menu_characters') + '</a>' +
+          '<a href="tierlist.html" class="profile-menu-item" data-i18n-key="menu_tierlist"><span class="pmi-icon">&#127942;</span> ' + t('menu_tierlist') + '</a>' +
+          '<a href="events.html" class="profile-menu-item" data-i18n-key="menu_events"><span class="pmi-icon">&#127881;</span> ' + t('menu_events') + '</a>' +
+          '<div class="profile-menu-divider"></div>' +
+          '<button class="profile-menu-item logout-item" data-i18n-key="menu_logout" onclick="Auth.logout()"><span class="pmi-icon">&#128682;</span> ' + t('menu_logout') + '</button>' +
+        '</div>' +
+      '</div>';
 
     navLinks.appendChild(li);
 
-    var logoutBtn = document.getElementById('navLogoutBtn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function () {
-        if (typeof Auth !== 'undefined') Auth.logout();
-        window.location.reload();
+    /* Toggle profile menu */
+    var avatarBtn = document.getElementById('profileAvatarBtn');
+    var profileMenu = document.getElementById('profileMenu');
+    if (avatarBtn && profileMenu) {
+      avatarBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        profileMenu.classList.toggle('open');
+      });
+      document.addEventListener('click', function (e) {
+        if (!profileMenu.contains(e.target) && e.target !== avatarBtn) {
+          profileMenu.classList.remove('open');
+        }
       });
     }
+  } else {
+    var loginText = (typeof I18n !== 'undefined') ? I18n.t('nav_login') : 'Login';
+    li.innerHTML =
+      '<a href="login.html" class="nav-login-btn" title="Login">' +
+        '<span class="nav-login-icon">&#128274;</span> ' + loginText +
+      '</a>';
+    navLinks.appendChild(li);
   }
+}
+
+function escNavHtml(str) {
+  if (!str) return '';
+  var d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function switchLang(lang) {
+  if (typeof I18n !== 'undefined') {
+    I18n.setLang(lang);
+  }
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  /* Re-apply navbar translations */
+  applyNavI18n();
 }
 
 /* Run immediately if DOM is ready, otherwise wait */

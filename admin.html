@@ -65,12 +65,12 @@
 
   <div class="admin-bar" id="adminBar">
     <div class="admin-bar-left">
-      <span class="admin-badge">ADMIN PANEL</span>
-      <a href="characters.html" class="admin-bar-link">View Site</a>
+      <span class="admin-badge" data-i18n="admin_panel">ADMIN PANEL</span>
+      <a href="characters.html" class="admin-bar-link" data-i18n="view_site">View Site</a>
     </div>
     <div class="admin-bar-right">
-      <span id="adminEmail" style="color:#94a3b8;font-size:13px;margin-right:12px;"></span>
-      <button class="admin-bar-btn" onclick="Auth.logout()">Logout</button>
+      <span id="adminEmail" class="admin-bar-email"></span>
+      <button class="admin-bar-btn" onclick="Auth.logout()" data-i18n="nav_logout">Logout</button>
     </div>
   </div>
 
@@ -89,8 +89,8 @@
     <div class="container">
       <div id="connectionStatus" style="margin-bottom:16px;"></div>
       <div class="admin-header">
-        <h1>&#128736; Admin Dashboard</h1>
-        <p>Manage characters and events</p>
+        <h1 data-i18n="admin_dashboard">&#128736; Admin Dashboard</h1>
+        <p data-i18n="admin_manage">Manage characters and events</p>
       </div>
 
       <!-- Admin Tabs -->
@@ -268,6 +268,8 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/data.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/events-db.js"></script>
   <script src="js/navbar.js"></script>
   <script>
     var ALL_WEAPONS=['Axe','Book','Cudgel','Dual Swords','Gauntlets','Greatsword','Lance','Longsword','Rapier','Shield','Staff','Wand'];
@@ -282,20 +284,10 @@
       document.getElementById('tab-'+tab).classList.add('active');
     }
 
-    /* ── Events localStorage ── */
-    function loadEventsFromStorage(){
-      var s=localStorage.getItem('7ds_events');
-      if(s){try{allEvents=JSON.parse(s)}catch(e){allEvents=getDefaultEvents()}}else{allEvents=getDefaultEvents()}
+    /* ── Events via EventDB (Supabase + localStorage fallback) ── */
+    async function loadEventsFromDB(){
+      if(typeof EventDB!=='undefined'){EventDB.init();allEvents=await EventDB.fetchAll();}else{allEvents=[];}
     }
-    function saveEventsToStorage(){localStorage.setItem('7ds_events',JSON.stringify(allEvents))}
-    function getDefaultEvents(){return[
-      {id:1,status:'active',tag:'event',title:'Holy War Raid',desc:'Team up with allies to defeat the Demon King in the limited-time Holy War Raid. Earn exclusive SSR shards and rare equipment.',start:'2026-03-01',end:'2026-03-15',color:'linear-gradient(90deg,#3b82f6,#60a5fa)',rewards:['SSR Shard x3','Gold x50,000','Raid Medal x20']},
-      {id:2,status:'active',tag:'update',title:'New Character: Tristan',desc:'The son of Meliodas and Elizabeth joins the battle. Limited banner available for a short time with boosted SSR rates.',start:'2026-03-05',end:'2026-03-20',color:'linear-gradient(90deg,#f0c040,#ffd966)',rewards:['Tristan SSR','Summon Ticket x10','Gems x500']},
-      {id:3,status:'active',tag:'event',title:'Daily Login Bonus',desc:'Log in every day during March to collect cumulative rewards including gems, tickets, and rare materials.',start:'2026-03-01',end:'2026-03-31',color:'linear-gradient(90deg,#0be881,#34d399)',rewards:['Gems x1,200','Summon Ticket x5','EXP Potion x30']},
-      {id:4,status:'upcoming',tag:'event',title:'Guild War Season 4',desc:'Compete against guilds worldwide in the new Guild War season.',start:'2026-03-20',end:'2026-04-05',color:'linear-gradient(90deg,#a78bfa,#c4b5fd)',rewards:['Guild Crest','Gems x2,000','Exclusive Title']},
-      {id:5,status:'upcoming',tag:'event',title:'Spring Festival',desc:'Celebrate the spring season with special story quests and limited cosmetics.',start:'2026-03-25',end:'2026-04-10',color:'linear-gradient(90deg,#f472b6,#fb7185)',rewards:['Spring Costume','Gems x800','Flower Tokens x100']},
-      {id:6,status:'ended',tag:'event',title:"Valentine's Day Event",desc:"A special event celebrating Valentine's Day with exclusive story content.",start:'2026-02-10',end:'2026-02-28',color:'linear-gradient(90deg,#f43f5e,#fb7185)',rewards:['Heart Charm','Gems x600','Valentine Frame']}
-    ]}
 
     /* ── Init ── */
     document.addEventListener("DOMContentLoaded",async()=>{
@@ -310,7 +302,7 @@
       }
       allCharacters=await CharDB.loadAll();
       renderDashboard();
-      loadEventsFromStorage();
+      await loadEventsFromDB();
       renderEventDashboard();
       SupaDB.subscribeToChanges(async()=>{allCharacters=await CharDB.loadAll();renderDashboard();showNotification('Data updated','info')});
     });
@@ -420,17 +412,20 @@
       d.innerHTML='<input type="text" class="reward-input" placeholder="e.g. Gems x500"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
       document.getElementById('rewardsEditor').appendChild(d);
     }
-    function saveEvent(){
+    async function saveEvent(){
       var t=document.getElementById('eventTitle').value.trim();if(!t){alert('Title required');return}
       var rewards=[];document.querySelectorAll('.reward-input').forEach(i=>{if(i.value.trim())rewards.push(i.value.trim())});
       var d={title:t,desc:document.getElementById('eventDesc').value,status:document.getElementById('eventStatus').value,tag:document.getElementById('eventTag').value,start:document.getElementById('eventStart').value,end:document.getElementById('eventEnd').value,color:document.getElementById('eventColor').value,rewards:rewards};
-      if(editingEventId){var idx=allEvents.findIndex(e=>e.id===editingEventId);if(idx!==-1){d.id=editingEventId;allEvents[idx]=d}}else{d.id=Date.now();allEvents.push(d)}
-      saveEventsToStorage();renderEventDashboard();hideEventForm();showNotification('Event "'+t+'" saved!','success');
+      try{
+        if(editingEventId){await EventDB.update(editingEventId,d);}else{await EventDB.add(d);}
+        allEvents=await EventDB.fetchAll();
+        renderEventDashboard();hideEventForm();showNotification('Event "'+t+'" saved!','success');
+      }catch(err){showNotification('Failed: '+(err.message||err),'error');}
     }
-    function deleteEvent(id){
-      var ev=allEvents.find(e=>e.id===id);if(!ev)return;
+    async function deleteEvent(id){
+      var ev=allEvents.find(e=>e.id==id);if(!ev)return;
       if(!confirm('Delete "'+ev.title+'"?'))return;
-      allEvents=allEvents.filter(e=>e.id!==id);saveEventsToStorage();renderEventDashboard();showNotification('Event deleted','success');
+      try{await EventDB.remove(id);allEvents=await EventDB.fetchAll();renderEventDashboard();showNotification('Event deleted','success');}catch(err){showNotification('Failed: '+(err.message||err),'error');}
     }
 
     /* ── Character Form ── */
@@ -474,7 +469,16 @@
       tempPotentials=JSON.parse(JSON.stringify(c.potentials||{}));
       buildWeaponToggles(c.types||[]);
       updateSkillsTabs();updatePotentialsTabs();
-      var ch='';(c.costumes||[]).forEach(cos=>{var n=(typeof cos==='string')?cos:(cos.name||'');ch+='<div class="costume-item-cms"><input type="text" class="costume-input" value="'+n.replace(/"/g,'&quot;')+'" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button></div>'});
+      var ch='';(c.costumes||[]).forEach(cos=>{
+        var n=(typeof cos==='string')?cos:(cos.name||'');
+        var img=(typeof cos==='object'&&cos.image)?cos.image:'';
+        ch+='<div class="costume-item-cms" style="flex-wrap:wrap;">'+
+          '<input type="text" class="costume-input" value="'+n.replace(/"/g,'&quot;')+'" placeholder="Costume name" style="flex:1;min-width:120px;">'+
+          '<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--dark3);color:var(--muted);font-size:12px;cursor:pointer;">'+
+          '<input type="file" accept="image/*" class="costume-image-input" style="display:none;" onchange="previewCostumeImg(this)">&#128247; Image</label>'+
+          '<img class="costume-thumb" src="'+(img||'')+'" style="width:40px;height:40px;border-radius:6px;object-fit:cover;'+(img?'':'display:none;')+'">'+
+          '<button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button></div>';
+      });
       document.getElementById('costumesEditor').innerHTML=ch;
       document.getElementById('formOverlay').style.display='flex';
       document.body.style.overflow='hidden';
@@ -541,7 +545,25 @@
       document.getElementById('potentialsEditor').innerHTML=h;
     }
     function updateTempPot(idx,val){tempPotentials[currentPotWeapon][idx].description=val}
-    function addCostumeField(){var d=document.createElement('div');d.className='costume-item-cms';d.innerHTML='<input type="text" class="costume-input" placeholder="Costume name"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';document.getElementById('costumesEditor').appendChild(d)}
+    function addCostumeField(){
+      var d=document.createElement('div');d.className='costume-item-cms';d.style.flexWrap='wrap';
+      d.innerHTML='<input type="text" class="costume-input" placeholder="Costume name" style="flex:1;min-width:120px;">'+
+        '<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--dark3);color:var(--muted);font-size:12px;cursor:pointer;">'+
+        '<input type="file" accept="image/*" class="costume-image-input" style="display:none;" onchange="previewCostumeImg(this)">&#128247; Image</label>'+
+        '<img class="costume-thumb" style="width:40px;height:40px;border-radius:6px;object-fit:cover;display:none;">'+
+        '<button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
+      document.getElementById('costumesEditor').appendChild(d);
+    }
+    function previewCostumeImg(input){
+      if(input.files&&input.files[0]){
+        var reader=new FileReader();
+        reader.onload=function(e){
+          var thumb=input.closest('.costume-item-cms').querySelector('.costume-thumb');
+          if(thumb){thumb.src=e.target.result;thumb.style.display='';}
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
 
     function handleImageUpload(input){
       if(input.files&&input.files[0]){
@@ -558,7 +580,21 @@
       document.getElementById('saveBtnText').style.display='none';document.getElementById('saveBtnLoading').style.display='inline';
       try{
         var selectedTypes=getSelectedWeapons(),costumes=[];
-        document.querySelectorAll('.costume-input').forEach(i=>{if(i.value.trim())costumes.push(i.value.trim())});
+        var costumeItems=document.querySelectorAll('.costume-item-cms');
+        for(var ci=0;ci<costumeItems.length;ci++){
+          var nameInput=costumeItems[ci].querySelector('.costume-input');
+          var imgInput=costumeItems[ci].querySelector('.costume-image-input');
+          var cName=nameInput?nameInput.value.trim():'';
+          if(!cName)continue;
+          var costumeObj={name:cName,image:''};
+          if(imgInput&&imgInput.files&&imgInput.files[0]){
+            try{var cu=await SupaDB.uploadImage(imgInput.files[0],'costume-'+cName.toLowerCase().replace(/[^a-z0-9]+/g,'-'));if(!cu.error&&cu.url)costumeObj.image=cu.url;}catch(ce){}
+          }else{
+            var thumb=costumeItems[ci].querySelector('.costume-thumb');
+            if(thumb&&thumb.src&&thumb.style.display!=='none')costumeObj.image=thumb.src;
+          }
+          costumes.push(costumeObj);
+        }
         var finalSkills={},finalPotentials={};
         selectedTypes.forEach(w=>{if(tempSkills[w])finalSkills[w]=tempSkills[w];if(tempPotentials[w])finalPotentials[w]=tempPotentials[w]});
         var slug=document.getElementById('charSlug').value.trim();

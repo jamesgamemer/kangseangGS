@@ -169,12 +169,12 @@
 
   <div class="page-content">
     <div class="page-header">
-      <div class="page-header-title">&#127942; Tier List</div>
-      <div class="page-header-sub">Drag &amp; Drop Characters to Build Your Tier List</div>
+      <div class="page-header-title" data-i18n="tl_title">&#127942; Tier List</div>
+      <div class="page-header-sub" data-i18n="tl_subtitle">Drag &amp; Drop Characters to Build Your Tier List</div>
     </div>
 
     <div class="container">
-      <p class="drag-hint">&#128073; Drag characters from the pool below into any tier row. Drag back to the pool to remove.</p>
+      <p class="drag-hint" data-i18n="tl_hint">&#128073; Drag characters from the pool below into any tier row. Drag back to the pool to remove.</p>
 
       <div class="tier-table" id="tierTable">
         <div class="tier-row">
@@ -199,22 +199,22 @@
         </div>
       </div>
 
-      <div class="pool-title">Character Pool</div>
+      <div class="pool-title" data-i18n="tl_pool">Character Pool</div>
       <div id="characterPool"></div>
 
       <div class="reset-btn">
-        <button class="btn btn-outline" onclick="resetTierList()">&#8635; Reset Tier List</button>
+        <button class="btn btn-outline" onclick="resetTierList()" data-i18n="tl_reset">&#8635; Reset Tier List</button>
       </div>
     </div>
   </div>
 
   <footer class="site-footer">
-    <p>7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
+    <p data-i18n="footer_text">7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
     <p style="margin-top:8px;">
-      <a href="index.html">Home</a> &nbsp;&bull;&nbsp;
-      <a href="characters.html">Characters</a> &nbsp;&bull;&nbsp;
-      <a href="tierlist.html">Tier List</a> &nbsp;&bull;&nbsp;
-      <a href="events.html">Events</a>
+      <a href="index.html" data-i18n="nav_home">Home</a> &nbsp;&bull;&nbsp;
+      <a href="characters.html" data-i18n="nav_characters">Characters</a> &nbsp;&bull;&nbsp;
+      <a href="tierlist.html" data-i18n="nav_tierlist">Tier List</a> &nbsp;&bull;&nbsp;
+      <a href="events.html" data-i18n="nav_events">Events</a>
     </p>
   </footer>
 
@@ -222,6 +222,7 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/navbar.js"></script>
   <script>
     /* Fixed image paths: use images/ (not ../images/) since tierlist.html is in root */

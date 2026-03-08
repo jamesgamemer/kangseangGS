@@ -52,6 +52,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/navbar.js"></script>
   <script>
     var charData = null;
@@ -216,7 +217,12 @@
         html += '<div class="costumes-section-v2"><div class="detail-section-title">Costumes</div><div class="costumes-grid-v2">';
         costumes.forEach(function(c) {
           var name = (typeof c === 'string') ? c : (c.name || '');
-          html += '<div class="costume-card-v2"><div class="costume-icon">&#128090;</div><p>' + esc(name) + '</p></div>';
+          var img = (typeof c === 'object' && c.image) ? c.image : '';
+          if (img) {
+            html += '<div class="costume-card-v2 has-image"><img src="'+esc(img)+'" alt="'+esc(name)+'" class="costume-card-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'"><div class="costume-icon" style="display:none;">&#128090;</div><p>' + esc(name) + '</p></div>';
+          } else {
+            html += '<div class="costume-card-v2"><div class="costume-icon">&#128090;</div><p>' + esc(name) + '</p></div>';
+          }
         });
         html += '</div></div>';
       }
@@ -226,6 +232,9 @@
 
     // ---- Initialize ----
     document.addEventListener("DOMContentLoaded", async () => {
+      // i18n
+      if (typeof I18n !== 'undefined') I18n.init();
+
       // Auth check
       if (await Auth.isLoggedIn()) {
         document.getElementById('adminBar').style.display = 'flex';

@@ -420,6 +420,79 @@ body {
 .skill-card h3 { margin-top: 0; color: var(--blue); }
 
 /* ============================================================
+   SKELETON LOADERS
+   ============================================================ */
+
+@keyframes skeleton-pulse {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--dark3) 0%, #1e293b 40%, var(--dark3) 80%);
+  background-size: 200px 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.skeleton-card {
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.skeleton-card .skeleton-img {
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(90deg, var(--dark3) 0%, #1e293b 40%, var(--dark3) 80%);
+  background-size: 200px 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card .skeleton-text {
+  height: 14px;
+  margin: 10px 12px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--dark3) 0%, #1e293b 40%, var(--dark3) 80%);
+  background-size: 200px 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card .skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-event-card {
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.skeleton-event-card .skeleton-banner {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(90deg, var(--dark3) 0%, #1e293b 40%, var(--dark3) 80%);
+  background-size: 200px 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-event-card .skeleton-line {
+  height: 16px;
+  margin: 12px 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--dark3) 0%, #1e293b 40%, var(--dark3) 80%);
+  background-size: 200px 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-event-card .skeleton-line.w60 { width: 60%; }
+.skeleton-event-card .skeleton-line.w40 { width: 40%; }
+
+/* ============================================================
    FOOTER
    ============================================================ */
 
