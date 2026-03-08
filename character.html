@@ -26,24 +26,24 @@
     <a href="index.html" class="navbar-logo">7DS<span>Origin</span></a>
     <div class="navbar-hamburger" id="navHam"><span></span><span></span><span></span></div>
     <ul class="navbar-links" id="navLinks">
-      <li><a href="index.html">&#127968; Home</a></li>
-      <li><a href="characters.html" class="active">&#9876; Characters</a></li>
-      <li><a href="tierlist.html">&#127942; Tier List</a></li>
-      <li><a href="events.html">&#127881; Events</a></li>
+      <li><a href="index.html" data-i18n="nav_home">&#127968; Home</a></li>
+      <li><a href="characters.html" class="active" data-i18n="nav_characters">&#9876; Characters</a></li>
+      <li><a href="tierlist.html" data-i18n="nav_tierlist">&#127942; Tier List</a></li>
+      <li><a href="events.html" data-i18n="nav_events">&#127881; Events</a></li>
     </ul>
   </nav>
 
   <div class="page-content">
     <div class="container">
-      <a href="characters.html" class="page-back-v2"><span class="arrow">&#8592;</span> Back to Characters</a>
+      <a href="characters.html" class="page-back-v2" id="backLink"><span class="arrow">&#8592;</span> <span data-i18n="cd_back">Back to Characters</span></a>
       <div id="characterContent">
-        <div class="no-data-msg">Loading character data...</div>
+        <div class="no-data-msg" data-i18n="cd_loading">Loading character data...</div>
       </div>
     </div>
   </div>
 
   <footer class="site-footer">
-    <p>7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
+    <p data-i18n="footer_text">7DS Origin Database &mdash; Fan-made site &mdash; Not affiliated with Netmarble</p>
   </footer>
 
   <!-- Supabase CDN -->
@@ -53,10 +53,19 @@
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
   <script src="js/i18n.js"></script>
+  <script src="js/i18n-characters.js"></script>
   <script src="js/navbar.js"></script>
   <script>
     var charData = null;
     var currentWeapon = null;
+
+    /* ---- Helper: get current language ---- */
+    function lang() {
+      return (typeof I18n !== 'undefined') ? I18n.getLang() : 'en';
+    }
+
+    /* ---- Helper: translate via CharTranslations ---- */
+    function CT() { return (typeof CharTranslations !== 'undefined') ? CharTranslations : null; }
 
     // ---- Utility Functions ----
     function esc(str) {
@@ -97,10 +106,30 @@
       return { clean: clean, hits: hits };
     }
 
+    /* ---- Translate weapon display name ---- */
+    function weaponDisplay(wk) {
+      var display = wk.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+      // Match to original types
+      if (charData && charData.types) {
+        charData.types.forEach(function(t) {
+          if (t.toLowerCase().replace(/\s+/g, '') === wk.toLowerCase().replace(/[\s_]+/g, '')) display = t;
+        });
+      }
+      // Translate if Thai
+      var ct = CT();
+      if (ct && lang() === 'th') {
+        return ct.getWeaponName(display, 'th');
+      }
+      return display;
+    }
+
     // ---- Render Functions ----
     function renderPage(c) {
       charData = c;
       document.title = c.name + ' - 7DS Origin';
+
+      var ct = CT();
+      var currentLang = lang();
 
       var hasSkills = false;
       if (c.skills && typeof c.skills === 'object') {
@@ -125,9 +154,24 @@
       }
 
       var rarityClass = (c.rarity === 'SSR') ? 'ssr' : 'sr';
+
+      /* Weapon type pills - translated */
       var typePills = (c.types || []).map(function(t) {
-        return '<span class="type-pill">' + esc(t) + '</span>';
+        var displayName = (ct && currentLang === 'th') ? ct.getWeaponName(t, 'th') : t;
+        return '<span class="type-pill">' + esc(displayName) + '</span>';
       }).join('');
+
+      /* Description - translated */
+      var descText = c.description;
+      if (ct && currentLang === 'th') {
+        var thDesc = ct.getDescription(c.name, 'th');
+        if (thDesc) descText = thDesc;
+      }
+
+      /* Section labels - translated */
+      var lblDesc = (ct) ? ct.getUILabel('Description', currentLang) : 'Description';
+      var lblWeapons = (ct) ? ct.getUILabel('Weapon Types:', currentLang) : 'Weapon Types:';
+      var lblSkillsSoon = (ct) ? ct.getUILabel('Skills data will be added soon.', currentLang) : 'Skills data will be added soon.';
 
       var html = '<div class="char-detail-header">';
       html += '<div class="char-detail-portrait">';
@@ -137,18 +181,15 @@
       html += '<div><span class="char-rarity-badge ' + rarityClass + '">' + esc(c.rarity) + '</span></div>';
       html += '</div>';
       html += '<div class="char-detail-info">';
-      html += '<div class="section-label">Description</div>';
-      html += '<p class="desc-text">' + esc(c.description) + '</p>';
-      html += '<div class="char-types"><span class="label">Weapon Types:</span>' + typePills + '</div>';
+      html += '<div class="section-label">' + esc(lblDesc) + '</div>';
+      html += '<p class="desc-text">' + esc(descText) + '</p>';
+      html += '<div class="char-types"><span class="label">' + esc(lblWeapons) + '</span>' + typePills + '</div>';
       html += '</div></div>';
 
       if (hasSkills && weaponKeys.length > 0) {
         html += '<div class="weapon-tabs-wrapper"><div class="weapon-tabs">';
         weaponKeys.forEach(function(wk, i) {
-          var display = wk.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-          (c.types || []).forEach(function(t) {
-            if (t.toLowerCase().replace(/\s+/g, '') === wk.toLowerCase().replace(/[\s_]+/g, '')) display = t;
-          });
+          var display = weaponDisplay(wk);
           var active = (i === 0) ? ' class="active"' : '';
           html += '<button onclick="showWeapon(\'' + esc(wk) + '\',this)"' + active + '>' + esc(display) + '</button>';
         });
@@ -157,12 +198,13 @@
         currentWeapon = weaponKeys[0];
       } else {
         html += '<div class="no-data-msg">';
-        html += '<p>&#128679; Skills data will be added soon.</p>';
+        html += '<p>&#128679; ' + esc(lblSkillsSoon) + '</p>';
         html += '</div>';
       }
 
       if (!c) {
-        document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">Character not found.</div>';
+        var notFoundMsg = (ct) ? ct.getUILabel('Character not found.', currentLang) : 'Character not found.';
+        document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">' + esc(notFoundMsg) + '</div>';
         return;
       }
 
@@ -178,10 +220,14 @@
       document.querySelectorAll('.weapon-tabs button').forEach(function(b) { b.classList.remove('active'); });
       if (btn) btn.classList.add('active');
 
+      var ct = CT();
+      var currentLang = lang();
+
       var skills = (charData.skills && charData.skills[type]) || [];
       var pots = (charData.potentials && charData.potentials[type]) || [];
-      var costumes = charData.costumes || [];
+      var costumesArr = charData.costumes || [];
 
+      /* Skills section */
       var html = '<div class="skills-grid-v2">';
       skills.forEach(function(sk, i) {
         var stype = sk.type || 'Normal';
@@ -189,8 +235,11 @@
         var isUlt = stype.toLowerCase() === 'ultimate';
         var extracted = extractHits(sk.description || '');
 
+        /* Translate skill type */
+        var displayType = (ct && currentLang === 'th') ? ct.getSkillType(stype, 'th') : stype;
+
         html += '<div class="skill-card-v2' + (isUlt ? ' ultimate-card' : '') + '">';
-        html += '<div class="skill-header"><div class="skill-name">' + esc(sk.name) + '</div><span class="skill-type-badge ' + badge + '">' + esc(stype) + '</span></div>';
+        html += '<div class="skill-header"><div class="skill-name">' + esc(sk.name) + '</div><span class="skill-type-badge ' + badge + '">' + esc(displayType) + '</span></div>';
         if (extracted.clean) html += '<div class="skill-desc">' + highlightNums(extracted.clean) + '</div>';
         if (extracted.hits.length > 0) {
           html += '<div class="dmg-breakdown">';
@@ -204,24 +253,34 @@
       });
       html += '</div>';
 
+      /* Potentials section */
       if (pots.length > 0) {
-        html += '<div class="potentials-section-v2"><div class="detail-section-title">Potentials</div><div class="potentials-grid-v2">';
+        var lblPotentials = (ct) ? ct.getUILabel('Potentials', currentLang) : 'Potentials';
+        var lblTier = (ct) ? ct.getUILabel('Tier', currentLang) : 'Tier';
+        html += '<div class="potentials-section-v2"><div class="detail-section-title">' + esc(lblPotentials) + '</div><div class="potentials-grid-v2">';
         pots.forEach(function(p, i) {
           var num = (p.tier || '').toString().match(/\d+/) || [i+1];
-          html += '<div class="potential-card-v2"><div class="tier-label">Tier ' + num + '</div><div class="tier-desc">' + highlightNums(p.description || '') + '</div></div>';
+          html += '<div class="potential-card-v2"><div class="tier-label">' + esc(lblTier) + ' ' + num + '</div><div class="tier-desc">' + highlightNums(p.description || '') + '</div></div>';
         });
         html += '</div></div>';
       }
 
-      if (costumes.length > 0) {
-        html += '<div class="costumes-section-v2"><div class="detail-section-title">Costumes</div><div class="costumes-grid-v2">';
-        costumes.forEach(function(c) {
-          var name = (typeof c === 'string') ? c : (c.name || '');
+      /* Costumes section */
+      if (costumesArr.length > 0) {
+        var lblCostumes = (ct) ? ct.getUILabel('Costumes', currentLang) : 'Costumes';
+        html += '<div class="costumes-section-v2"><div class="detail-section-title">' + esc(lblCostumes) + '</div><div class="costumes-grid-v2">';
+        costumesArr.forEach(function(c) {
+          var nameEn = (typeof c === 'string') ? c : (c.name || '');
           var img = (typeof c === 'object' && c.image) ? c.image : '';
+          /* Translate costume name */
+          var displayName = nameEn;
+          if (ct && currentLang === 'th') {
+            displayName = ct.getCostumeName(nameEn, 'th');
+          }
           if (img) {
-            html += '<div class="costume-card-v2 has-image"><img src="'+esc(img)+'" alt="'+esc(name)+'" class="costume-card-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'"><div class="costume-icon" style="display:none;">&#128090;</div><p>' + esc(name) + '</p></div>';
+            html += '<div class="costume-card-v2 has-image"><img src="'+esc(img)+'" alt="'+esc(displayName)+'" class="costume-card-img" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'"><div class="costume-icon" style="display:none;">&#128090;</div><p>' + esc(displayName) + '</p></div>';
           } else {
-            html += '<div class="costume-card-v2"><div class="costume-icon">&#128090;</div><p>' + esc(name) + '</p></div>';
+            html += '<div class="costume-card-v2"><div class="costume-icon">&#128090;</div><p>' + esc(displayName) + '</p></div>';
           }
         });
         html += '</div></div>';
@@ -230,10 +289,20 @@
       document.getElementById('weaponContent').innerHTML = html;
     }
 
+    /* ---- Re-render on language change ---- */
+    function onLangChange() {
+      if (charData) {
+        renderPage(charData);
+      }
+    }
+
     // ---- Initialize ----
     document.addEventListener("DOMContentLoaded", async () => {
       // i18n
-      if (typeof I18n !== 'undefined') I18n.init();
+      if (typeof I18n !== 'undefined') {
+        I18n.init();
+        I18n.onChange(onLangChange);
+      }
 
       // Auth check
       if (await Auth.isLoggedIn()) {
@@ -249,10 +318,14 @@
         if (character) {
           renderPage(character);
         } else {
-          document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">Character not found.</div>';
+          var ct = CT();
+          var notFoundMsg = (ct) ? ct.getUILabel('Character not found.', lang()) : 'Character not found.';
+          document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">' + notFoundMsg + '</div>';
         }
       } else {
-        document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">No character selected.</div>';
+        var ct = CT();
+        var noSelMsg = (ct) ? ct.getUILabel('No character selected.', lang()) : 'No character selected.';
+        document.getElementById('characterContent').innerHTML = '<div class="no-data-msg">' + noSelMsg + '</div>';
       }
     });
   </script>

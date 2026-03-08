@@ -145,10 +145,10 @@
     <a href="index.html" class="navbar-logo">7DS<span>Origin</span></a>
     <div class="navbar-hamburger" id="navHam"><span></span><span></span><span></span></div>
     <ul class="navbar-links" id="navLinks">
-      <li><a href="index.html">&#127968; Home</a></li>
-      <li><a href="characters.html" class="active">&#9876; Characters</a></li>
-      <li><a href="tierlist.html">&#127942; Tier List</a></li>
-      <li><a href="events.html">&#127881; Events</a></li>
+      <li><a href="index.html" data-i18n="nav_home">&#127968; Home</a></li>
+      <li><a href="characters.html" class="active" data-i18n="nav_characters">&#9876; Characters</a></li>
+      <li><a href="tierlist.html" data-i18n="nav_tierlist">&#127942; Tier List</a></li>
+      <li><a href="events.html" data-i18n="nav_events">&#127881; Events</a></li>
     </ul>
   </nav>
 
@@ -189,10 +189,17 @@
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
   <script src="js/i18n.js"></script>
+  <script src="js/i18n-characters.js"></script>
   <script src="js/navbar.js"></script>
   <script>
     var currentFilter = 'all';
     var allCharacters = [];
+
+    /* ---- Helper: get current language ---- */
+    function lang() {
+      return (typeof I18n !== 'undefined') ? I18n.getLang() : 'en';
+    }
+    function CT() { return (typeof CharTranslations !== 'undefined') ? CharTranslations : null; }
 
     function filterWeapon(type, btn) {
       currentFilter = type;
@@ -220,10 +227,21 @@
       });
       var types = Object.keys(typesMap).sort();
       var container = document.getElementById('filterButtons');
-      var html = '<button onclick="filterWeapon(\'all\',this)" class="active-filter">All</button>';
+      var ct = CT();
+      var currentLang = lang();
+
+      /* "All" button - translated */
+      var allLabel = (ct) ? ct.getUILabel('All', currentLang) : 'All';
+      var html = '<button onclick="filterWeapon(\'all\',this)" class="active-filter">' + allLabel + '</button>';
+
       types.forEach(function(t) {
         var key = t.toLowerCase().replace(/\s+/g, '');
-        html += '<button onclick="filterWeapon(\'' + key + '\',this)">' + t + '</button>';
+        /* Translate weapon name */
+        var displayName = t;
+        if (ct && currentLang === 'th') {
+          displayName = ct.getWeaponName(t, 'th');
+        }
+        html += '<button onclick="filterWeapon(\'' + key + '\',this)">' + displayName + '</button>';
       });
       container.innerHTML = html;
     }
@@ -254,8 +272,28 @@
       grid.innerHTML = html;
     }
 
+    /* ---- Rebuild filters on language change ---- */
+    function onLangChange() {
+      if (allCharacters.length > 0) {
+        buildFilters(allCharacters);
+        /* Re-apply current filter state */
+        var btns = document.querySelectorAll('.filters button');
+        btns.forEach(function(btn) {
+          if (currentFilter === 'all' && btn.textContent.trim() === (CT() ? CT().getUILabel('All', lang()) : 'All')) {
+            btn.classList.add('active-filter');
+          }
+        });
+      }
+    }
+
     // ---- Initialize ----
     document.addEventListener("DOMContentLoaded", async () => {
+      // i18n
+      if (typeof I18n !== 'undefined') {
+        I18n.init();
+        I18n.onChange(onLangChange);
+      }
+
       // Auth check
       const admin = await Auth.isLoggedIn();
       if (admin) {
