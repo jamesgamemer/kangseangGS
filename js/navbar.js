@@ -91,15 +91,25 @@ function applyNavI18n() {
     'events.html': { icon: '&#127881;', key: 'nav_events' }
   };
 
-  navbar-links > li > a').forEach(function(a) {
-    var href = a.getAttribute('href');
-    if (!href) return;
-    var page = href.split('/').pop();
-    var mapping = navMap[page];
-    if (mapping) {
-      a.innerHTML = mapping.icon + ' <span class="nav-text">' + I18n.t(mapping.key).toUpperCase() + '</span>';
-    }
-  });
+document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+
+var href = a.getAttribute('href');
+if (!href) return;
+
+var page = href.split('/').pop();
+var mapping = navMap[page];
+
+if (mapping) {
+
+a.innerHTML =
+mapping.icon +
+' <span class="nav-text">' +
+I18n.t(mapping.key).toUpperCase() +
+'</span>';
+
+}
+
+});
 
   /* Update login button text if present */
   var loginBtn = document.querySelector('.nav-login-btn');
