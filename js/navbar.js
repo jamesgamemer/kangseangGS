@@ -33,9 +33,9 @@ function initNavbar() {
   /* clear old text first to prevent duplication */
   a.innerHTML = '';
 
-  var icon = document.createElement('span');
-  icon.className = 'nav-icon';
-  icon.innerHTML = mapping.icon;
+   var icon = document.createElement("span");
+   icon.className = "nav-icon";
+   icon.innerHTML = mapping.icon || "";
 
   var text = document.createElement('span');
   text.className = 'nav-text';
