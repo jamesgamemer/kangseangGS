@@ -228,6 +228,14 @@
           <div class="form-modal-body">
             <input type="hidden" id="editEventId">
             <div class="cms-section">
+              <div class="form-group">
+              <label>Event Banner</label>
+
+              <input type="file" id="eventImage" accept="image/*">
+
+              <img id="eventPreview"
+              style="width:100%;max-height:160px;object-fit:cover;margin-top:10px;border-radius:8px;display:none;">
+              </div>
               <div class="cms-section-header"><div class="cms-section-num">1</div><h3>Event Info</h3></div>
               <div class="cms-section-body">
                 <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" placeholder="e.g. Holy War Raid"></div>
@@ -630,5 +638,6 @@
       setTimeout(()=>{n.style.opacity='0';n.style.transition='opacity .5s';setTimeout(()=>n.remove(),500)},3000);
     }
   </script>
+  
 </body>
 </html>
