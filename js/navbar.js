@@ -21,13 +21,31 @@ function initNavbar() {
 
   /* ── Highlight active link ── */
   var current = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.navbar-links a').forEach(function (a) {
-    var href = a.getAttribute('href');
-    if (href) {
-      var page = href.split('/').pop();
-      if (page === current) a.classList.add('active');
-    }
-  });
+ document.querySelectorAll('.navbar-links > li > a').forEach(function(a) {
+
+  var href = a.getAttribute('href');
+  if (!href) return;
+
+  var page = href.split('/').pop();
+  var mapping = navMap[page];
+  if (!mapping) return;
+
+  /* clear old text first to prevent duplication */
+  a.innerHTML = '';
+
+  var icon = document.createElement('span');
+  icon.className = 'nav-icon';
+  icon.innerHTML = mapping.icon;
+
+  var text = document.createElement('span');
+  text.className = 'nav-text';
+  text.textContent = I18n.t(mapping.key).toUpperCase();
+
+  a.appendChild(icon);
+  a.appendChild(document.createTextNode(' '));
+  a.appendChild(text);
+
+});
 
   /* ── Language Switcher ── */
   var navLinks = document.getElementById('navLinks');
@@ -73,7 +91,7 @@ function applyNavI18n() {
     'events.html': { icon: '&#127881;', key: 'nav_events' }
   };
 
-  document.querySelectorAll('.navbar-links > li > a').forEach(function(a) {
+  navbar-links > li > a').forEach(function(a) {
     var href = a.getAttribute('href');
     if (!href) return;
     var page = href.split('/').pop();
