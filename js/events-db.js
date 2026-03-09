@@ -148,35 +148,35 @@ var EventDB = (function () {
   }
 
   /* ── Field Mapping ── */
-  function _mapFromSupabase(row) {
-    return {
-      id: row.id,
-      title: row.title || '',
-      desc: row.description || '',
-      status: row.status || 'active',
-      tag: row.event_type || 'event',
-      start: row.start_date || '',
-      end: row.end_date || '',
-      color: row.color || 'linear-gradient(90deg,#3b82f6,#60a5fa)',
-      image: row.image || '',
-      rewards: row.rewards || [],
-      created_at: row.created_at
-    };
-  }
+ function _mapFromSupabase(row) {
+  return {
+    id: row.id,
+    title: row.title_en || row.title_th || '',
+    desc: row.description_en || row.description_th || '',
+    status: row.status || 'active',
+    tag: row.event_type || 'event',
+    start: row.start_date || '',
+    end: row.end_date || '',
+    color: row.color || 'linear-gradient(90deg,#3b82f6,#60a5fa)',
+    image: row.image || '',
+    rewards: row.rewards || [],
+    created_at: row.created_at
+  };
+}
 
   function _mapToSupabase(ev) {
-    return {
-      title: ev.title || '',
-      description: ev.desc || ev.description || '',
-      status: ev.status || 'active',
-      event_type: ev.tag || ev.event_type || 'event',
-      start_date: ev.start || ev.start_date || null,
-      end_date: ev.end || ev.end_date || null,
-      color: ev.color || 'linear-gradient(90deg,#3b82f6,#60a5fa)',
-      image: ev.image || '',
-      rewards: ev.rewards || []
-    };
-  }
+  return {
+    title_en: ev.title || '',
+    description_en: ev.desc || '',
+    status: ev.status || 'active',
+    event_type: ev.tag || 'event',
+    start_date: ev.start || null,
+    end_date: ev.end || null,
+    color: ev.color || 'linear-gradient(90deg,#3b82f6,#60a5fa)',
+    image: ev.image || '',
+    rewards: ev.rewards || []
+  };
+}
 
   /* ── localStorage Fallback ── */
   function _localFetchAll() {
