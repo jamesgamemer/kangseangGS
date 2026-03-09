@@ -823,27 +823,32 @@
     }, 1000);
 
     /* ── Init ── */
-    document.addEventListener("DOMContentLoaded", async () => {
-      /* i18n */
-      if (typeof I18n !== 'undefined') I18n.init();
+ document.addEventListener("DOMContentLoaded", async () => {
 
-      /* EventDB init */
-      if (typeof EventDB !== 'undefined') EventDB.init();
+  /* i18n */
+  if (typeof I18n !== 'undefined') I18n.init();
 
-      /* Auth check */
-      isAdmin = await Auth.isLoggedIn();
-      if (isAdmin) {
-        document.getElementById('adminBar').style.display = 'flex';
-        document.getElementById('adminAddEventBar').style.display = 'flex';
-      }
+  /* Supabase */
+  if (typeof SupaDB !== 'undefined') SupaDB.init();
 
-      /* Load events from EventDB (Supabase or localStorage) */
-      allEvents = await EventDB.fetchAll();
-      renderEvents();
+  /* EventDB */
+  if (typeof EventDB !== 'undefined') EventDB.init();
 
-      /* Apply translations */
-      if (typeof I18n !== 'undefined') I18n.applyTranslations();
-    });
+  /* Auth check */
+  isAdmin = await Auth.isLoggedIn();
+
+  if (isAdmin) {
+    document.getElementById('adminBar').style.display = 'flex';
+    document.getElementById('adminAddEventBar').style.display = 'flex';
+  }
+
+  /* Load events */
+  allEvents = await EventDB.fetchAll();
+  renderEvents();
+
+  if (typeof I18n !== 'undefined') I18n.applyTranslations();
+
+});
   </script>
 </body>
 </html>
