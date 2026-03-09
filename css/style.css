@@ -534,3 +534,48 @@ color:#60a5fa;
 text-decoration:none;
 margin-right:8px;
 }
+/* HIDE OLD ADMIN BAR */
+
+.admin-bar{
+display:none !important;
+}
+.admin-header{
+
+display:flex;
+align-items:center;
+gap:14px;
+
+background:#111827;
+border-bottom:1px solid #f0c040;
+
+padding:10px 20px;
+
+}
+
+.admin-badge{
+
+background:#f0c040;
+color:#000;
+font-weight:700;
+
+padding:3px 8px;
+border-radius:4px;
+
+font-size:12px;
+}
+
+.logout-btn{
+
+margin-left:auto;
+
+background:#1e293b;
+color:#fff;
+
+border:1px solid #334155;
+padding:6px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
