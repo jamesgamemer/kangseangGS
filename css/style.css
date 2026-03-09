@@ -42,7 +42,7 @@ body {
    ============================================================ */
 
 .navbar {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
@@ -518,23 +518,4 @@ body {
   .character-layout { flex-direction: column; align-items: center; }
   .skills { grid-template-columns: 1fr; }
   .character-card { width: 100%; max-width: 350px; }
-}
-/* ===============================
-STICKY NAVBAR
-=============================== */
-
-.navbar{
-position:sticky;
-top:0;
-z-index:1000;
-
-background:rgba(10,15,30,0.85);
-backdrop-filter:blur(12px);
--webkit-backdrop-filter:blur(12px);
-
-border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
-@media (max-width: 600px) {
-  .container { padding: 25px 15px; }
 }
