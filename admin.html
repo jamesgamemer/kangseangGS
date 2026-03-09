@@ -420,16 +420,56 @@
       d.innerHTML='<input type="text" class="reward-input" placeholder="e.g. Gems x500"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
       document.getElementById('rewardsEditor').appendChild(d);
     }
-    async function saveEvent(){
-      var t=document.getElementById('eventTitle').value.trim();if(!t){alert('Title required');return}
-      var rewards=[];document.querySelectorAll('.reward-input').forEach(i=>{if(i.value.trim())rewards.push(i.value.trim())});
-      var d={title:t,desc:document.getElementById('eventDesc').value,status:document.getElementById('eventStatus').value,tag:document.getElementById('eventTag').value,start:document.getElementById('eventStart').value,end:document.getElementById('eventEnd').value,color:document.getElementById('eventColor').value,rewards:rewards};
-      try{
-        if(editingEventId){await EventDB.update(editingEventId,d);}else{await EventDB.add(d);}
-        allEvents=await EventDB.fetchAll();
-        renderEventDashboard();hideEventForm();showNotification('Event "'+t+'" saved!','success');
-      }catch(err){showNotification('Failed: '+(err.message||err),'error');}
-    }
+   async function saveEvent(){
+
+var t=document.getElementById('eventTitle').value.trim();
+if(!t){alert('Title required');return}
+
+var start=document.getElementById('eventStart').value;
+var end=document.getElementById('eventEnd').value;
+
+var today=new Date().toISOString().slice(0,10);
+
+var status="active";
+
+if(start && today < start) status="upcoming";
+if(end && today > end) status="ended";
+
+var rewards=[];
+document.querySelectorAll('.reward-input').forEach(i=>{
+  if(i.value.trim()) rewards.push(i.value.trim())
+});
+
+var d={
+  title:t,
+  desc:document.getElementById('eventDesc').value,
+  status:status,
+  tag:document.getElementById('eventTag').value,
+  start:start,
+  end:end,
+  color:document.getElementById('eventColor').value,
+  rewards:rewards
+};
+
+try{
+
+if(editingEventId){
+await EventDB.update(editingEventId,d);
+}else{
+await EventDB.add(d);
+}
+
+allEvents=await EventDB.fetchAll();
+renderEventDashboard();
+hideEventForm();
+
+showNotification('Event "'+t+'" saved!','success');
+
+}catch(err){
+showNotification('Failed: '+(err.message||err),'error');
+}
+
+}
     async function deleteEvent(id){
       var ev=allEvents.find(e=>e.id==id);if(!ev)return;
       if(!confirm('Delete "'+ev.title+'"?'))return;
