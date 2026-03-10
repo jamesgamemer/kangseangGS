@@ -27,6 +27,21 @@ key:'nav_events'
 }
 
 };
+/* =========================
+   NAV MAP
+========================= */
+
+var navMap = {
+  'index.html': { icon: '🏠', key: 'nav_home' },
+  'characters.html': { icon: '⚔', key: 'nav_characters' },
+  'tierlist.html': { icon: '🏆', key: 'nav_tierlist' },
+  'events.html': { icon: '🎉', key: 'nav_events' }
+};
+
+
+/* =========================
+   INIT NAVBAR
+========================= */
 
 function initNavbar() {
   if (window._navbarInitDone) return;
