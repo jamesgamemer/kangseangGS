@@ -1,3 +1,5 @@
+const supabase = window.supabaseClient
+
 async function loadGuides(){
 
 const { data, error } = await supabase
@@ -5,11 +7,11 @@ const { data, error } = await supabase
 .select("*")
 .order("created_at",{ascending:false})
 
-const list=document.getElementById("guideList")
+const list = document.getElementById("guideList")
 
 data.forEach(g=>{
 
-list.innerHTML+=`
+list.innerHTML += `
 <div class="guide-card">
 <a href="guide.html?slug=${g.slug}">
 <h3>${g.title}</h3>
