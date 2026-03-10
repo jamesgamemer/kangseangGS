@@ -1,26 +1,23 @@
-const params=new URLSearchParams(window.location.search)
-const slug=params.get("slug")
+const db = window.supabaseClient
+
+const params = new URLSearchParams(window.location.search)
+const slug = params.get("slug")
 
 async function loadGuide(){
 
-let {data}=await supabase
+const { data, error } = await db
 .from("guides")
 .select("*")
-.eq("slug",slug)
+.eq("slug", slug)
 .single()
 
-const container=document.getElementById("guideContent")
+if(!data) return
 
-data.blocks.forEach(b=>{
+const container = document.getElementById("guideContent")
 
-container.innerHTML+=`
-<div class="guide-box">
-<div class="guide-title">${b.title}</div>
-<div class="guide-content">${b.content}</div>
-</div>
+container.innerHTML = `
+<h1>${data.title}</h1>
 `
-
-})
 
 }
 
