@@ -1,0 +1,18 @@
+.guide-box{
+background:#1f2430;
+padding:20px;
+margin-bottom:20px;
+border-radius:6px;
+border-left:4px solid #4db8ff;
+}
+
+.guide-title{
+font-weight:bold;
+color:#fff;
+margin-bottom:10px;
+}
+
+.guide-content{
+color:#cfd4da;
+line-height:1.6;
+}
