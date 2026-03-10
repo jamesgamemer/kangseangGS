@@ -3,50 +3,47 @@
    + Google-style Admin Profile Menu + Login Button
    Global i18n integration: all nav text uses data-i18n
    ============================================================ */
+/* ── NAVIGATION MAP ── */
+const navMap = {
+
+'index.html': {
+icon:'&#127968;',
+key:'nav_home'
+},
+
+'characters.html': {
+icon:'&#9876;',
+key:'nav_characters'
+},
+
+'tierlist.html': {
+icon:'&#127942;',
+key:'nav_tierlist'
+},
+
+'events.html': {
+icon:'&#127881;',
+key:'nav_events'
+}
+
+};
+
 function initNavbar() {
   if (window._navbarInitDone) return;
   window._navbarInitDone = true;
 
-  /* ── Apply i18n to existing nav links ── */
+  /* Apply i18n to nav links */
   applyNavI18n();
 
-  /* ── Hamburger toggle ── */
+  /* Hamburger toggle */
   var ham = document.getElementById('navHam');
   var links = document.getElementById('navLinks');
+
   if (ham && links) {
     ham.addEventListener('click', function () {
       links.classList.toggle('open');
     });
   }
-
-  /* ── Highlight active link ── */
-  var current = window.location.pathname.split('/').pop() || 'index.html';
- document.querySelectorAll('.navbar-links > li > a').forEach(function(a) {
-
-  var href = a.getAttribute('href');
-  if (!href) return;
-
-  var page = href.split('/').pop();
-  var mapping = navMap[page];
-  if (!mapping) return;
-
-  /* clear old text first to prevent duplication */
-  a.innerHTML = '';
-
-   var icon = document.createElement("span");
-   icon.className = "nav-icon";
-   icon.innerHTML = mapping.icon || "";
-
-  var text = document.createElement('span');
-  text.className = 'nav-text';
-  text.textContent = I18n.t(mapping.key).toUpperCase();
-
-  a.appendChild(icon);
-  a.appendChild(document.createTextNode(' '));
-  a.appendChild(text);
-
-});
-
   /* ── Language Switcher ── */
   var navLinks = document.getElementById('navLinks');
   if (navLinks && !navLinks.querySelector('.nav-lang-switcher')) {
@@ -81,15 +78,8 @@ function initNavbar() {
 }
 
 function applyNavI18n() {
-  if (typeof I18n === 'undefined') return;
 
-  /* Update nav links text */
-  var navMap = {
-    'index.html': { icon: '&#127968;', key: 'nav_home' },
-    'characters.html': { icon: '&#9876;', key: 'nav_characters' },
-    'tierlist.html': { icon: '&#127942;', key: 'nav_tierlist' },
-    'events.html': { icon: '&#127881;', key: 'nav_events' }
-  };
+if (typeof I18n === 'undefined') return;
 
 document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
 
