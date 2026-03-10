@@ -7,10 +7,20 @@ const { data, error } = await db
 .select("*")
 .order("created_at",{ascending:false})
 
-if(error) return
+if(error){
+console.error("Guide load error:", error)
+return
+}
+
+console.log("Guides:", data)
 
 const newbie = document.getElementById("newbieGuides")
 const generic = document.getElementById("genericGuides")
+
+if(!data || data.length===0){
+console.warn("No guides found")
+return
+}
 
 data.forEach(g=>{
 
@@ -40,8 +50,12 @@ if(g.category==="newbie"){
 newbie.innerHTML += card
 }
 
-if(g.category==="generic"){
+else if(g.category==="generic"){
 generic.innerHTML += card
+}
+
+else{
+console.warn("Unknown category:", g.category)
 }
 
 })
