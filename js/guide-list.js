@@ -9,6 +9,8 @@ const { data, error } = await supabase
 
 const list = document.getElementById("guideList")
 
+if(!data) return
+
 data.forEach(g=>{
 
 list.innerHTML += `
