@@ -753,34 +753,55 @@
       document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
     })();
 
-    /* ── Featured characters (SSR only, unique) ── */
-    (function () {
-      const chars = [
-        {name:"Escanor",  rarity:"SSR", img:"images/Escanor.png",  link:"characters/Escanor.html"},
-        {name:"Derieri",  rarity:"SSR", img:"images/Derieri.png",  link:"characters/Derieri.html"},
-        {name:"Diane",    rarity:"SSR", img:"images/Diane.png",    link:"characters/Diane.html"},
-        {name:"Meliodas", rarity:"SSR", img:"images/Meliodas.png", link:"characters/Meliodas.html"},
-        {name:"Elizabeth",rarity:"SSR", img:"images/Elizabeth.png",link:"characters/Elizabeth.html"},
-        {name:"Tioreh",   rarity:"SSR", img:"images/Tioreh.png",   link:"characters/Tioreh.html"},
-        {name:"Daisy",    rarity:"SSR", img:"images/Daisy.png",    link:"characters/Daisy.html"},
-        {name:"Gowther",  rarity:"SSR", img:"images/Gowther.png",  link:"characters/Gowther.html"},
-        {name:"Merlin",   rarity:"SSR", img:"images/Merlin.png",   link:"characters/Merlin.html"},
-        {name:"King",     rarity:"SSR", img:"images/King.png",     link:"characters/King.html"},
-        {name:"Tristan",  rarity:"SSR", img:"images/Tristan.png",  link:"characters/Tristan.html"},
-        {name:"Ban",      rarity:"SSR", img:"images/Ban.png",      link:"characters/Ban.html"},
-      ];
-      const grid = document.getElementById('featuredGrid');
-      chars.forEach(function (c) {
-        grid.innerHTML += `
-          <a href="${c.link}" class="feat-card reveal">
-            <span class="feat-card-badge">SSR</span>
-            <img src="${c.img}" alt="${c.name}" loading="lazy">
-            <div class="feat-card-info">
-              <div class="feat-card-name">${c.name}</div>
-              <div class="feat-card-rarity SSR">&#9733; SSR</div>
-            </div>
-          </a>`;
-      });
+    /* ── Featured Characters from Database ── */
+async function loadFeaturedCharacters(){
+
+  const grid = document.getElementById("featuredGrid");
+
+  grid.innerHTML =
+  `<div style="color:#aaa;padding:20px">Loading characters...</div>`;
+
+  let characters = [];
+
+  try{
+    characters = await CharDB.loadAll();
+  }catch(e){
+    console.error("Character load error",e);
+  }
+
+  if(!characters || characters.length === 0){
+    grid.innerHTML = `<div>No characters found</div>`;
+    return;
+  }
+
+  let html = "";
+
+  characters.slice(0,20).forEach(c=>{
+
+    const img = c.image || "https://placehold.co/300x400";
+    const slug = encodeURIComponent(c.slug);
+
+    html += `
+    <a href="character.html?slug=${slug}" class="feat-card">
+
+      <span class="feat-card-badge">${c.rarity}</span>
+
+      <img src="${img}" loading="lazy">
+
+      <div class="feat-card-info">
+        <div class="feat-card-name">${c.name}</div>
+        <div class="feat-card-rarity">★ ${c.rarity}</div>
+      </div>
+
+    </a>
+    `;
+  });
+
+  grid.innerHTML = html;
+
+}
+
+document.addEventListener("DOMContentLoaded",loadFeaturedCharacters);
       /* re-observe new elements */
       const obs = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
