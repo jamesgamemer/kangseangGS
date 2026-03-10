@@ -4,13 +4,13 @@
  */
 
 const GuideSystemConfig = {
-  // Supabase Configuration
   supabase: {
-    enabled: false, // Set to true to enable Supabase
-    url: process.env.SUPABASE_URL || '',
-    key: process.env.SUPABASE_KEY || '',
+    enabled: true,
+    url: 'https://your-project.supabase.co',
+    key: 'your-anon-key',
     bucket: 'guide-media'
-  },
+  }
+};
 
   // Media Upload Settings
   media: {
