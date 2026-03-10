@@ -7,14 +7,14 @@
           "id": 1,
           "title": "Introduction to the Game",
           "slug": "introduction",
-          "image": "images/guides/intro.jpg",
+          "image": "../images/guides/intro.jpg",
           "description": "Learn the basics of the game and get started with your first adventure."
         },
         {
           "id": 2,
           "title": "Reroll Guide",
           "slug": "reroll",
-          "image": "images/guides/reroll.jpg",
+          "image": "../images/guides/reroll.jpg",
           "description": "Learn how to reroll and start the game correctly."
         }
       ]
@@ -26,21 +26,21 @@
           "id": 3,
           "title": "Combat Basics",
           "slug": "combat-basics",
-          "image": "images/guides/combat.jpg",
+          "image": "../images/guides/combat.jpg",
           "description": "Master the fundamentals of combat mechanics."
         },
         {
           "id": 4,
           "title": "Character Progression",
           "slug": "character-progression",
-          "image": "images/guides/progression.jpg",
+          "image": "../images/guides/progression.jpg",
           "description": "Learn how to level up and progress your characters."
         },
         {
           "id": 5,
           "title": "Effects Dictionary",
           "slug": "effects-dictionary",
-          "image": "images/guides/effects.jpg",
+          "image": "../images/guides/effects.jpg",
           "description": "Complete reference for all game effects and status."
         }
       ]
@@ -52,14 +52,14 @@
           "id": 6,
           "title": "Characters",
           "slug": "characters",
-          "image": "images/guides/characters.jpg",
+          "image": "../images/guides/characters.jpg",
           "description": "Complete character database and tier list."
         },
         {
           "id": 7,
           "title": "Gear",
           "slug": "gear",
-          "image": "images/guides/gear.jpg",
+          "image": "../images/guides/gear.jpg",
           "description": "All available gear and equipment guide."
         }
       ]
