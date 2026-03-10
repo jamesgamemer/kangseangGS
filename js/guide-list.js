@@ -1,8 +1,8 @@
-const supabase = window.supabaseClient
+const db = window.supabaseClient
 
 async function loadGuides(){
 
-const { data, error } = await supabase
+const { data, error } = await db
 .from("guides")
 .select("*")
 .order("created_at",{ascending:false})
