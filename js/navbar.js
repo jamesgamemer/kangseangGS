@@ -32,19 +32,30 @@ var page = href.split('/').pop();
 var mapping = navMap[page];
 if (!mapping) return;
 
-a.innerHTML = '';
+var label = I18n.t(mapping.key);
 
-var icon = document.createElement("span");
+/* หา icon */
+var icon = a.querySelector('.nav-icon');
+
+/* ถ้าไม่มี icon ให้สร้าง */
+if(!icon){
+icon = document.createElement("span");
 icon.className = "nav-icon";
 icon.innerHTML = mapping.icon;
+a.prepend(icon);
+}
 
-var text = document.createElement('span');
-text.className = 'nav-text';
-text.textContent = I18n.t(mapping.key).toUpperCase();
+/* หา text */
+var text = a.querySelector('.nav-text');
 
-a.appendChild(icon);
-a.appendChild(document.createTextNode(' '));
+if(!text){
+text = document.createElement("span");
+text.className = "nav-text";
 a.appendChild(text);
+}
+
+/* update text */
+text.textContent = label.toUpperCase();
 
 });
 
