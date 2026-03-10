@@ -1,65 +1,39 @@
-const db = window.supabaseClient
+async function loadGuide(){
 
-async function loadGuides(){
+const params = new URLSearchParams(window.location.search)
+const slug = params.get("slug")
 
-const { data, error } = await db
+const { data: guide, error } = await supabase
 .from("guides")
 .select("*")
-.order("created_at",{ascending:false})
+.eq("slug", slug)
+.single()
 
-if(error){
-console.error("Guide load error:", error)
+if(!guide){
+console.error("Guide not found")
 return
 }
 
-console.log("Guides:", data)
+document.getElementById("guideTitle").textContent = guide.title
+document.getElementById("guideDate").textContent = new Date(guide.created_at).toLocaleDateString()
 
-const newbie = document.getElementById("newbieGuides")
-const generic = document.getElementById("genericGuides")
+const { data: blocks } = await supabase
+.from("guide_blocks")
+.select("*")
+.eq("guide_id", guide.id)
+.order("position", { ascending: true })
 
-if(!data || data.length===0){
-console.warn("No guides found")
-return
-}
+if(!blocks) return
 
-data.forEach(g=>{
+const container = document.getElementById("guideContent")
 
-const card = `
-<a href="guide.html?slug=${g.slug}" class="guide-card">
-
-<img class="guide-thumb"
-src="images/guides/${g.slug}.jpg"
-onerror="this.src='images/guides/default.jpg'">
-
-<div class="guide-info">
-
-<div class="guide-name">
-${g.title}
-</div>
-
-<div class="guide-arrow">
-→
-</div>
-
-</div>
-
-</a>
-`
-
-if(g.category==="newbie"){
-newbie.innerHTML += card
-}
-
-else if(g.category==="generic"){
-generic.innerHTML += card
-}
-
-else{
-console.warn("Unknown category:", g.category)
-}
-
+blocks.forEach(block=>{
+const div = document.createElement("div")
+div.className = "guide-section"
+div.innerHTML = `<h2>${block.title}</h2><p>${block.content}</p>`
+container.appendChild(div)
 })
 
 }
 
-loadGuides()
+loadGuide()
