@@ -11,12 +11,16 @@ const { data, error } = await db
 .eq("slug", slug)
 .single()
 
-if(!data) return
+if(error){
+console.log(error)
+return
+}
 
 const container = document.getElementById("guideContent")
 
 container.innerHTML = `
 <h1>${data.title}</h1>
+<p>Guide content coming soon...</p>
 `
 
 }
