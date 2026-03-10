@@ -1,54 +1,27 @@
-async function loadGuides(){
+async function publishGuide(){
 
-const res = await fetch("data/guides.json")
+let title=document.getElementById("title").value
 
-const data = await res.json()
+let blocks=[]
 
-const container = document.getElementById("guide-sections")
+document.querySelectorAll(".block").forEach(b=>{
 
-data.sections.forEach(section =>{
-
-const sectionDiv = document.createElement("div")
-
-sectionDiv.className = "guide-section"
-
-sectionDiv.innerHTML = `
-<h2 class="section-title">${section.title}</h2>
-<div class="guide-grid"></div>
-`
-
-const grid = sectionDiv.querySelector(".guide-grid")
-
-section.guides.forEach(g =>{
-
-const card = document.createElement("a")
-
-card.className = "guide-card"
-
-card.href = g.url
-
-card.innerHTML = `
-
-<img src="${g.image}">
-
-<div class="guide-info">
-
-<div class="guide-title">${g.title}</div>
-
-<div class="guide-desc">${g.description || ""}</div>
-
-</div>
-
-`
-
-grid.appendChild(card)
+blocks.push({
+type:b.dataset.type,
+title:b.querySelector(".btitle").value,
+content:b.querySelector(".bcontent").value
+})
 
 })
 
-container.appendChild(sectionDiv)
+let slug=title.toLowerCase().replaceAll(" ","-")
 
+await supabase.from("guides").insert({
+title:title,
+slug:slug,
+blocks:blocks
 })
+
+alert("Guide Published!")
 
 }
-
-loadGuides()
