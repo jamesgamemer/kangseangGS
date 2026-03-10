@@ -7,17 +7,19 @@ const { data, error } = await db
 .select("*")
 .order("created_at",{ascending:false})
 
-const list = document.getElementById("guideList")
+if(error) return
 
-if(!data) return
+const newbie = document.getElementById("newbieGuides")
+const generic = document.getElementById("genericGuides")
 
 data.forEach(g=>{
 
-list.innerHTML += `
+const card = `
 <a href="guide.html?slug=${g.slug}" class="guide-card">
 
 <img class="guide-thumb"
-src="https://placehold.co/80x80">
+src="images/guides/${g.slug}.jpg"
+onerror="this.src='images/guides/default.jpg'">
 
 <div class="guide-info">
 
@@ -33,6 +35,14 @@ ${g.title}
 
 </a>
 `
+
+if(g.category==="newbie"){
+newbie.innerHTML += card
+}
+
+if(g.category==="generic"){
+generic.innerHTML += card
+}
 
 })
 
