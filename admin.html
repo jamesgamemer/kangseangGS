@@ -509,7 +509,7 @@ showNotification('Failed: '+(err.message||err),'error');
       document.getElementById('costumesEditor').innerHTML='';
       document.getElementById('weaponSkillsTabs').innerHTML='';
       document.getElementById('weaponPotentialsTabs').innerHTML='';
-      document.getElementById('formOverlay').style.display='flex';
+      document.getElementById('formOverlay').classList.add('active');
       document.body.style.overflow='hidden';
     }
     function editCharacter(id){
