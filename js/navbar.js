@@ -17,46 +17,52 @@ const navMap = {
    INIT NAVBAR
 ========================= */
 
-function initNavbar() {
-  if (window._navbarInitDone) return;
-  window._navbarInitDone = true;
+function initNavbar(){
 
-  /* Apply i18n to nav links */
-  applyNavI18n();
+if(window._navbarInitDone) return;
+window._navbarInitDone = true;
 
-  /* Hamburger toggle */
-  var ham = document.getElementById('navHam');
-  var links = document.getElementById('navLinks');
+/* render navbar */
+document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
 
-  if (ham && links) {
-    ham.addEventListener('click', function () {
-      links.classList.toggle('open');
-    });
-  }
-  /* ── Language Switcher ── */
-  var navLinks = document.getElementById('navLinks');
-  if (navLinks && !navLinks.querySelector('.nav-lang-switcher')) {
-    var langLi = document.createElement('li');
-    langLi.className = 'nav-lang-switcher';
-    var currentLang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'en';
-    langLi.innerHTML =
-      '<div class="lang-switch-group">' +
-        '<button class="lang-btn' + (currentLang === 'en' ? ' active' : '') + '" data-lang="en">EN</button>' +
-        '<span class="lang-divider">|</span>' +
-        '<button class="lang-btn' + (currentLang === 'th' ? ' active' : '') + '" data-lang="th">TH</button>' +
-      '</div>';
-    navLinks.appendChild(langLi);
+var href = a.getAttribute('href');
+if (!href) return;
 
-    /* Attach click events to language buttons */
-    langLi.querySelectorAll('.lang-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        switchLang(btn.dataset.lang);
-      });
-    });
-  }
+var page = href.split('/').pop();
+var mapping = navMap[page];
+if (!mapping) return;
 
-  /* ── Auth: Google-style Profile Menu or Login Button ── */
-  injectAuthUI();
+a.innerHTML = '';
+
+var icon = document.createElement("span");
+icon.className = "nav-icon";
+icon.innerHTML = mapping.icon;
+
+var text = document.createElement('span');
+text.className = 'nav-text';
+text.textContent = I18n.t(mapping.key).toUpperCase();
+
+a.appendChild(icon);
+a.appendChild(document.createTextNode(' '));
+a.appendChild(text);
+
+});
+
+/* language switch */
+setupLangSwitch();
+
+/* hamburger */
+var ham = document.getElementById('navHam');
+var links = document.getElementById('navLinks');
+
+if(ham && links){
+ham.addEventListener('click', function(){
+links.classList.toggle('open');
+});
+}
+
+/* auth menu */
+injectAuthUI();
 
   /* ── Listen for language changes to update navbar text ── */
   if (typeof I18n !== 'undefined') {
