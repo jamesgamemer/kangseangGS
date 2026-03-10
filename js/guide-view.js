@@ -11,13 +11,23 @@ const { data, error } = await db
 .eq("slug", slug)
 .single()
 
-if(error){
+if(error || !data){
+
 console.log(error)
+
+document.getElementById("guideContent").innerHTML = `
+<h2>Guide not found</h2>
+`
+
 return
 }
 
 document.getElementById("guideTitle").innerText = data.title
-document.getElementById("guideDate").innerText = data.created_at
+
+const date = new Date(data.created_at)
+
+document.getElementById("guideDate").innerText =
+date.toLocaleDateString()
 
 const container = document.getElementById("guideContent")
 
