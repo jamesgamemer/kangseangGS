@@ -22,6 +22,7 @@ var I18n = (function () {
       nav_logout: 'Logout',
       nav_dashboard: 'Dashboard',
       nav_settings: 'Settings',
+      nav_guides: 'Guides',
 
       // Hero
       hero_badge: 'Fan Database',
