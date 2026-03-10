@@ -35,6 +35,7 @@ body {
   background: var(--dark2);
   color: var(--text);
   min-height: 100vh;
+  overflow-x:hidden;
 }
 
 /* ============================================================
@@ -56,6 +57,7 @@ body {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(240,192,64,0.2);
   transition: background 0.3s;
+  backdrop-filter: blur(12px);
 }
 
 .navbar-logo {
