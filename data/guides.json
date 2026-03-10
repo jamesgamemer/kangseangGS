@@ -1,0 +1,70 @@
+{
+  "sections":[
+
+{
+"title":"Introduction",
+"guides":[
+
+{
+"title":"Introduction to the Game",
+"image":"images/guides/intro.jpg",
+"url":"guides/introduction.html",
+"description":"Learn the basics"
+},
+
+{
+"title":"Reroll Guide",
+"image":"images/guides/reroll.jpg",
+"url":"guides/reroll.html",
+"description":"Start the game correctly"
+}
+
+]
+},
+
+{
+"title":"Generic Guides",
+"guides":[
+
+{
+"title":"Combat Basics",
+"image":"images/guides/combat.jpg",
+"url":"guides/combat.html"
+},
+
+{
+"title":"Character Progression",
+"image":"images/guides/progression.jpg",
+"url":"guides/progression.html"
+},
+
+{
+"title":"Effects Dictionary",
+"image":"images/guides/effects.jpg",
+"url":"guides/effects.html"
+}
+
+]
+},
+
+{
+"title":"Database & Tier Lists",
+"guides":[
+
+{
+"title":"Characters",
+"image":"images/guides/characters.jpg",
+"url":"characters.html"
+},
+
+{
+"title":"Gear",
+"image":"images/guides/gear.jpg",
+"url":"gear.html"
+}
+
+]
+}
+
+]
+}
