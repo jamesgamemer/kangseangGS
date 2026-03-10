@@ -113,10 +113,16 @@ top:0;
 z-index:1200;
 }
 
-.navbar{
-position:sticky;
-top:40px;
-z-index:1000;
+/* ADMIN BAR FIX */
+.admin-bar{
+position: relative;
+z-index: 2000;
+background: linear-gradient(90deg,#0b1220,#0e1a2e);
+border-bottom:1px solid #c6a84a;
+padding:8px 14px;
+display:flex;
+align-items:center;
+gap:10px;
 }
 /* ---- Login Page ---- */
 .login-wrapper {
