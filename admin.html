@@ -228,14 +228,6 @@
           <div class="form-modal-body">
             <input type="hidden" id="editEventId">
             <div class="cms-section">
-              <div class="form-group">
-              <label>Event Banner</label>
-
-              <input type="file" id="eventImage" accept="image/*">
-
-              <img id="eventPreview"
-              style="width:100%;max-height:160px;object-fit:cover;margin-top:10px;border-radius:8px;display:none;">
-              </div>
               <div class="cms-section-header"><div class="cms-section-num">1</div><h3>Event Info</h3></div>
               <div class="cms-section-body">
                 <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" placeholder="e.g. Holy War Raid"></div>
@@ -300,18 +292,6 @@
     /* ── Init ── */
     document.addEventListener("DOMContentLoaded",async()=>{
       const admin=await Auth.isLoggedIn();
-
-document.getElementById("charName").addEventListener("input",function(){
-
-var slug=this.value
-.toLowerCase()
-.replace(/[^a-z0-9]+/g,'-')
-.replace(/(^-|-$)/g,'');
-
-document.getElementById("charSlug").value=slug;
-
-});
-
       if(!admin){window.location.href='login.html';return}
       if(SupaDB.isConnected()){
         const session=await SupaDB.getSession();
@@ -383,8 +363,8 @@ document.getElementById("charSlug").value=slug;
         h+='<div class="admin-char-name">'+(ev.title||'Untitled')+' <span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:'+sc+';color:#fff;margin-left:6px;">'+sl+'</span></div>';
         h+='<div class="admin-char-meta">'+tl+' &bull; '+(ev.start||'')+' &rarr; '+(ev.end||'')+'</div>';
         h+='</div></div><div class="admin-char-actions">';
-        h+=`<button class="action-btn edit-btn" title="Edit" onclick="editEvent('${ev.id}')">&#9998;</button>`;
-        h+=`<button class="action-btn delete-btn" title="Delete" onclick="deleteEvent('${ev.id}')">&#128465;</button>`;
+        h+='<button class="action-btn edit-btn" title="Edit" onclick="editEvent('+ev.id+')">&#9998;</button>';
+        h+='<button class="action-btn delete-btn" title="Delete" onclick="deleteEvent('+ev.id+')">&#128465;</button>';
         h+='</div></div>';
       });
       document.getElementById('adminEventList').innerHTML=h;
@@ -409,7 +389,7 @@ document.getElementById("charSlug").value=slug;
       document.body.style.overflow='hidden';
     }
     function editEvent(id){
-      var ev=allEvents.find(e=>String(e.id)===String(id));if(!ev)return;
+      var ev=allEvents.find(e=>e.id===id);if(!ev)return;
       editingEventId=id;
       document.getElementById('eventFormTitle').textContent='Edit: '+ev.title;
       document.getElementById('editEventId').value=id;
@@ -432,56 +412,16 @@ document.getElementById("charSlug").value=slug;
       d.innerHTML='<input type="text" class="reward-input" placeholder="e.g. Gems x500"><button class="btn-remove-item" onclick="this.parentElement.remove();">&times;</button>';
       document.getElementById('rewardsEditor').appendChild(d);
     }
-   async function saveEvent(){
-
-var t=document.getElementById('eventTitle').value.trim();
-if(!t){alert('Title required');return}
-
-var start=document.getElementById('eventStart').value;
-var end=document.getElementById('eventEnd').value;
-
-var today=new Date().toISOString().slice(0,10);
-
-var status="active";
-
-if(start && today < start) status="upcoming";
-if(end && today > end) status="ended";
-
-var rewards=[];
-document.querySelectorAll('.reward-input').forEach(i=>{
-  if(i.value.trim()) rewards.push(i.value.trim())
-});
-
-var d={
-  title:t,
-  desc:document.getElementById('eventDesc').value,
-  status:status,
-  tag:document.getElementById('eventTag').value,
-  start:start,
-  end:end,
-  color:document.getElementById('eventColor').value,
-  rewards:rewards
-};
-
-try{
-
-if(editingEventId){
-await EventDB.update(editingEventId,d);
-}else{
-await EventDB.add(d);
-}
-
-allEvents=await EventDB.fetchAll();
-renderEventDashboard();
-hideEventForm();
-
-showNotification('Event "'+t+'" saved!','success');
-
-}catch(err){
-showNotification('Failed: '+(err.message||err),'error');
-}
-
-}
+    async function saveEvent(){
+      var t=document.getElementById('eventTitle').value.trim();if(!t){alert('Title required');return}
+      var rewards=[];document.querySelectorAll('.reward-input').forEach(i=>{if(i.value.trim())rewards.push(i.value.trim())});
+      var d={title:t,desc:document.getElementById('eventDesc').value,status:document.getElementById('eventStatus').value,tag:document.getElementById('eventTag').value,start:document.getElementById('eventStart').value,end:document.getElementById('eventEnd').value,color:document.getElementById('eventColor').value,rewards:rewards};
+      try{
+        if(editingEventId){await EventDB.update(editingEventId,d);}else{await EventDB.add(d);}
+        allEvents=await EventDB.fetchAll();
+        renderEventDashboard();hideEventForm();showNotification('Event "'+t+'" saved!','success');
+      }catch(err){showNotification('Failed: '+(err.message||err),'error');}
+    }
     async function deleteEvent(id){
       var ev=allEvents.find(e=>e.id==id);if(!ev)return;
       if(!confirm('Delete "'+ev.title+'"?'))return;
@@ -509,7 +449,7 @@ showNotification('Failed: '+(err.message||err),'error');
       document.getElementById('costumesEditor').innerHTML='';
       document.getElementById('weaponSkillsTabs').innerHTML='';
       document.getElementById('weaponPotentialsTabs').innerHTML='';
-      document.getElementById('formOverlay').classList.add('active');
+      document.getElementById('formOverlay').style.display='flex';
       document.body.style.overflow='hidden';
     }
     function editCharacter(id){
@@ -543,13 +483,9 @@ showNotification('Failed: '+(err.message||err),'error');
       document.getElementById('formOverlay').style.display='flex';
       document.body.style.overflow='hidden';
     }
-    function hideForm(){document.getElementById('formOverlay').classList.remove('active');document.body.style.overflow=''}
-   function closeFormOverlay(e){
-if(e.target.id==='formOverlay'){
-document.getElementById('formOverlay').classList.remove('active');
-document.body.style.overflow='';
-}
-}
+    function hideForm(){document.getElementById('formOverlay').style.display='none';document.body.style.overflow=''}
+    function closeFormOverlay(e){if(e.target.id==='formOverlay')hideForm()}
+
     /* ── Weapon Toggles ── */
     function buildWeaponToggles(sel){
       var c=document.getElementById('weaponToggles'),h='';
@@ -630,30 +566,13 @@ document.body.style.overflow='';
     }
 
     function handleImageUpload(input){
-
-if(input.files && input.files[0]){
-
-tempImageFile=input.files[0];
-
-var reader=new FileReader();
-
-reader.onload=function(e){
-
-var img=document.getElementById('previewImg');
-
-img.src=e.target.result;
-
-img.style.display='block';
-
-document.getElementById('imagePrompt').style.display='none';
-
-};
-
-reader.readAsDataURL(tempImageFile);
-
-}
-
-}
+      if(input.files&&input.files[0]){
+        tempImageFile=input.files[0];
+        var reader=new FileReader();
+        reader.onload=function(e){document.getElementById('previewImg').src=e.target.result;document.getElementById('previewImg').style.display='';document.getElementById('imagePrompt').style.display='none'};
+        reader.readAsDataURL(tempImageFile);
+      }
+    }
 
     async function saveCharacter(){
       var name=document.getElementById('charName').value.trim();if(!name){alert('Name required');return}
@@ -690,28 +609,9 @@ reader.readAsDataURL(tempImageFile);
       finally{saveBtn.disabled=false;document.getElementById('saveBtnText').style.display='inline';document.getElementById('saveBtnLoading').style.display='none'}
     }
     async function deleteCharacter(id,name){
-
-if(!confirm('Delete '+name+'?')) return;
-
-try{
-
-var r=await CharDB.remove(id);
-
-if(r.error) throw r.error;
-
-allCharacters = await CharDB.loadAll();
-
-renderDashboard();
-
-showNotification('Deleted','success');
-
-}catch(e){
-
-showNotification('Failed: '+e.message,'error');
-
-}
-
-}
+      if(!confirm('Delete '+name+'?'))return;
+      try{var r=await CharDB.remove(id);if(r.error)throw r.error;showNotification('Deleted','success')}catch(e){showNotification('Failed: '+e.message,'error')}
+    }
     function doExport(){CharDB.exportJSON(allCharacters)}
     function handleImport(event){
       var file=event.target.files[0];if(!file)return;
@@ -730,6 +630,5 @@ showNotification('Failed: '+e.message,'error');
       setTimeout(()=>{n.style.opacity='0';n.style.transition='opacity .5s';setTimeout(()=>n.remove(),500)},3000);
     }
   </script>
-  
 </body>
 </html>
