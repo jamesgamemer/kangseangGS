@@ -72,7 +72,7 @@ injectAuthUI();
   }
 }
 
-function applyNavI18n() {
+function applyNavI18n(); {
 
 if (typeof I18n === 'undefined') return;
 
