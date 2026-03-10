@@ -6,38 +6,12 @@
 /* ── NAVIGATION MAP ── */
 const navMap = {
 
-'index.html': {
-icon:'&#127968;',
-key:'nav_home'
-},
-
-'characters.html': {
-icon:'&#9876;',
-key:'nav_characters'
-},
-
-'tierlist.html': {
-icon:'&#127942;',
-key:'nav_tierlist'
-},
-
-'events.html': {
-icon:'&#127881;',
-key:'nav_events'
-}
-
-};
-/* =========================
-   NAV MAP
-========================= */
-
-var navMap = {
-  'index.html': { icon: '🏠', key: 'nav_home' },
+ 'index.html': { icon: '🏠', key: 'nav_home' },
   'characters.html': { icon: '⚔', key: 'nav_characters' },
   'tierlist.html': { icon: '🏆', key: 'nav_tierlist' },
   'events.html': { icon: '🎉', key: 'nav_events' }
-};
 
+};
 
 /* =========================
    INIT NAVBAR
