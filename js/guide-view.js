@@ -13,15 +13,23 @@ const { data:guide } = await db
 
 document.getElementById("guideTitle").textContent = guide.title
 
-const { data:blocks } = await db
+const { data: blocks, error } = await db
 .from("guide_blocks")
 .select("*")
-.eq("guide_id",guide.id)
+.eq("guide_id", guide.id)
 .order("position")
 
-const container = document.getElementById("guideContent")
+if (error) {
+  console.error("Guide blocks error:", error)
+  return
+}
 
-blocks.forEach(b=>{
+if (!blocks || blocks.length === 0) {
+  console.log("No blocks found")
+  return
+}
+
+blocks.forEach(b => {
 
 let html=""
 
