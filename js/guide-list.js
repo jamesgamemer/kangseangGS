@@ -14,11 +14,24 @@ if(!data) return
 data.forEach(g=>{
 
 list.innerHTML += `
-<div class="guide-card">
-<a href="guide.html?slug=${g.slug}">
-<h3>${g.title}</h3>
-</a>
+<a href="guide.html?slug=${g.slug}" class="guide-card">
+
+<img class="guide-thumb"
+src="https://placehold.co/80x80">
+
+<div class="guide-info">
+
+<div class="guide-name">
+${g.title}
 </div>
+
+<div class="guide-arrow">
+→
+</div>
+
+</div>
+
+</a>
 `
 
 })
