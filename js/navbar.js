@@ -21,20 +21,28 @@ const navMap = {
 
 function initNavbar(){
 
-  if(window._navbarInitDone) return;
-  window._navbarInitDone = true;
+if(window._navbarInitDone) return;
+window._navbarInitDone = true;
 
-  renderNavbar();
-  setupHamburger();
-  setupLangSwitch();
-  injectAuthUI();
-
-  /* update text when language changes */
-  if(typeof I18n !== 'undefined'){
-    I18n.onChange(applyNavI18n);
-  }
+/* wait until i18n is ready */
+if(typeof I18n !== "undefined"){
+applyNavI18n();
+}else{
+setTimeout(initNavbar,100);
+return;
 }
 
+/* Hamburger menu */
+var ham = document.getElementById('navHam');
+var links = document.getElementById('navLinks');
+
+if(ham && links){
+ham.addEventListener('click', function(){
+links.classList.toggle('open');
+});
+}
+
+}
 
 /* ============================================================
    RENDER NAVBAR ICON + TEXT
