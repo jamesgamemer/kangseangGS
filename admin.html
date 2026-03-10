@@ -543,8 +543,12 @@ showNotification('Failed: '+(err.message||err),'error');
       document.getElementById('formOverlay').style.display='flex';
       document.body.style.overflow='hidden';
     }
-    function hideForm(){document.getElementById('formOverlay').style.display='none';document.body.style.overflow=''}
-    function closeFormOverlay(e){if(e.target.id==='formOverlay')hideForm()}
+    function hideForm(){document.getElementById('formOverlay').classList.remove('active');document.body.style.overflow=''}
+   function closeFormOverlay(e){
+if(e.target.id==='formOverlay'){
+document.getElementById('formOverlay').classList.remove('active');
+document.body.style.overflow='';
+}
 
     /* ── Weapon Toggles ── */
     function buildWeaponToggles(sel){
