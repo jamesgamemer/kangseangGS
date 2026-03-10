@@ -11,6 +11,8 @@ const navMap = {
   'characters.html': { icon: '⚔', key: 'nav_characters' },
   'tierlist.html': { icon: '🏆', key: 'nav_tierlist' },
   'events.html': { icon: '🎉', key: 'nav_events' }
+  'guides.html': { icon: '📘', key: 'nav_guides' }
+   
 };
 
 
