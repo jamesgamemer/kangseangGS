@@ -83,20 +83,18 @@ if (!href) return;
 
 var page = href.split('/').pop();
 var mapping = navMap[page];
-
 if (!mapping) return;
 
-var label = (typeof I18n !== "undefined")
-? I18n.t(mapping.key)
-: mapping.key;
+var label = I18n.t(mapping.key);
 
-a.innerHTML =
-mapping.icon +
-' <span class="nav-text">' +
-label.toUpperCase() +
-'</span>';
+var text = a.querySelector('.nav-text');
+if(text){
+text.textContent = label.toUpperCase();
+}
 
 });
+
+}
 
   /* Update login button text if present */
   var loginBtn = document.querySelector('.nav-login-btn');
