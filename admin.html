@@ -300,6 +300,18 @@
     /* ── Init ── */
     document.addEventListener("DOMContentLoaded",async()=>{
       const admin=await Auth.isLoggedIn();
+
+document.getElementById("charName").addEventListener("input",function(){
+
+var slug=this.value
+.toLowerCase()
+.replace(/[^a-z0-9]+/g,'-')
+.replace(/(^-|-$)/g,'');
+
+document.getElementById("charSlug").value=slug;
+
+});
+
       if(!admin){window.location.href='login.html';return}
       if(SupaDB.isConnected()){
         const session=await SupaDB.getSession();
@@ -614,13 +626,30 @@ showNotification('Failed: '+(err.message||err),'error');
     }
 
     function handleImageUpload(input){
-      if(input.files&&input.files[0]){
-        tempImageFile=input.files[0];
-        var reader=new FileReader();
-        reader.onload=function(e){document.getElementById('previewImg').src=e.target.result;document.getElementById('previewImg').style.display='';document.getElementById('imagePrompt').style.display='none'};
-        reader.readAsDataURL(tempImageFile);
-      }
-    }
+
+if(input.files && input.files[0]){
+
+tempImageFile=input.files[0];
+
+var reader=new FileReader();
+
+reader.onload=function(e){
+
+var img=document.getElementById('previewImg');
+
+img.src=e.target.result;
+
+img.style.display='block';
+
+document.getElementById('imagePrompt').style.display='none';
+
+};
+
+reader.readAsDataURL(tempImageFile);
+
+}
+
+}
 
     async function saveCharacter(){
       var name=document.getElementById('charName').value.trim();if(!name){alert('Name required');return}
@@ -657,9 +686,28 @@ showNotification('Failed: '+(err.message||err),'error');
       finally{saveBtn.disabled=false;document.getElementById('saveBtnText').style.display='inline';document.getElementById('saveBtnLoading').style.display='none'}
     }
     async function deleteCharacter(id,name){
-      if(!confirm('Delete '+name+'?'))return;
-      try{var r=await CharDB.remove(id);if(r.error)throw r.error;showNotification('Deleted','success')}catch(e){showNotification('Failed: '+e.message,'error')}
-    }
+
+if(!confirm('Delete '+name+'?')) return;
+
+try{
+
+var r=await CharDB.remove(id);
+
+if(r.error) throw r.error;
+
+allCharacters = await CharDB.loadAll();
+
+renderDashboard();
+
+showNotification('Deleted','success');
+
+}catch(e){
+
+showNotification('Failed: '+e.message,'error');
+
+}
+
+}
     function doExport(){CharDB.exportJSON(allCharacters)}
     function handleImport(event){
       var file=event.target.files[0];if(!file)return;
