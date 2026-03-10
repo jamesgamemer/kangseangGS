@@ -1,8 +1,5 @@
 /* ============================================================
    NAVBAR SYSTEM (Stable Version)
-   - icon + text render once
-   - language switch
-   - auth profile menu
    ============================================================ */
 
 /* NAV MAP */
@@ -24,56 +21,61 @@ function initNavbar(){
 if(window._navbarInitDone) return;
 window._navbarInitDone = true;
 
-/* wait until i18n is ready */
-if(typeof I18n !== "undefined"){
+/* render menu */
+renderNavbar();
+
+/* language buttons */
+setupLangSwitch();
+
+/* auth menu */
+injectAuthUI();
+
+/* hamburger */
+setupHamburger();
+
+/* apply translation */
 applyNavI18n();
-}else{
-setTimeout(initNavbar,100);
-return;
-}
 
-/* Hamburger menu */
-var ham = document.getElementById('navHam');
-var links = document.getElementById('navLinks');
-
-if(ham && links){
-ham.addEventListener('click', function(){
-links.classList.toggle('open');
-});
+/* listen language change */
+if(typeof I18n !== 'undefined'){
+  I18n.onChange(function(){
+    applyNavI18n();
+  });
 }
 
 }
+
 
 /* ============================================================
-   RENDER NAVBAR ICON + TEXT
+   RENDER NAVBAR
    ============================================================ */
 
 function renderNavbar(){
 
-  document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
 
-    var href = a.getAttribute('href');
-    if(!href) return;
+var href = a.getAttribute('href');
+if(!href) return;
 
-    var page = href.split('/').pop();
-    var mapping = navMap[page];
-    if(!mapping) return;
+var page = href.split('/').pop();
+var mapping = navMap[page];
+if(!mapping) return;
 
-    a.innerHTML = '';
+a.innerHTML='';
 
-    var icon = document.createElement("span");
-    icon.className = "nav-icon";
-    icon.innerHTML = mapping.icon;
+var icon=document.createElement("span");
+icon.className="nav-icon";
+icon.innerHTML=mapping.icon;
 
-    var text = document.createElement("span");
-    text.className = "nav-text";
-    text.textContent = getLabel(mapping.key);
+var text=document.createElement("span");
+text.className="nav-text";
+text.textContent=getLabel(mapping.key);
 
-    a.appendChild(icon);
-    a.appendChild(document.createTextNode(' '));
-    a.appendChild(text);
+a.appendChild(icon);
+a.appendChild(document.createTextNode(' '));
+a.appendChild(text);
 
-  });
+});
 
 }
 
@@ -84,85 +86,86 @@ function renderNavbar(){
 
 function applyNavI18n(){
 
-  document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
 
-    var href = a.getAttribute('href');
-    if(!href) return;
+var href=a.getAttribute('href');
+if(!href) return;
 
-    var page = href.split('/').pop();
-    var mapping = navMap[page];
-    if(!mapping) return;
+var page=href.split('/').pop();
+var mapping=navMap[page];
+if(!mapping) return;
 
-    var text = a.querySelector('.nav-text');
-    if(text){
-      text.textContent = getLabel(mapping.key);
-    }
+var text=a.querySelector('.nav-text');
 
-  });
+if(text){
+text.textContent=getLabel(mapping.key);
+}
+
+});
 
 }
 
 
 /* ============================================================
-   LANGUAGE SWITCH BUTTON
+   LANGUAGE SWITCH
    ============================================================ */
 
 function setupLangSwitch(){
 
-  var navLinks = document.getElementById('navLinks');
-  if(!navLinks || navLinks.querySelector('.nav-lang-switcher')) return;
+var navLinks=document.getElementById('navLinks');
+if(!navLinks||navLinks.querySelector('.nav-lang-switcher')) return;
 
-  var li = document.createElement('li');
-  li.className = 'nav-lang-switcher';
+var li=document.createElement('li');
+li.className='nav-lang-switcher';
 
-  var current = getLang();
+var current=getLang();
 
-  li.innerHTML =
-    '<div class="lang-switch-group">'+
-    '<button class="lang-btn '+(current==='en'?'active':'')+'" data-lang="en">EN</button>'+
-    '<span class="lang-divider">|</span>'+
-    '<button class="lang-btn '+(current==='th'?'active':'')+'" data-lang="th">TH</button>'+
-    '</div>';
+li.innerHTML=
+'<div class="lang-switch-group">'+
+'<button class="lang-btn '+(current==='en'?'active':'')+'" data-lang="en">EN</button>'+
+'<span class="lang-divider">|</span>'+
+'<button class="lang-btn '+(current==='th'?'active':'')+'" data-lang="th">TH</button>'+
+'</div>';
 
-  navLinks.appendChild(li);
+navLinks.appendChild(li);
 
-  li.querySelectorAll('.lang-btn').forEach(function(btn){
+li.querySelectorAll('.lang-btn').forEach(function(btn){
 
-    btn.addEventListener('click',function(){
+btn.addEventListener('click',function(){
 
-      var lang = btn.dataset.lang;
+var lang=btn.dataset.lang;
 
-      if(typeof I18n !== 'undefined'){
-        I18n.setLang(lang);
-      }
+if(typeof I18n!=='undefined'){
+I18n.setLang(lang);
+}
 
-      li.querySelectorAll('.lang-btn').forEach(b=>{
-        b.classList.toggle('active',b.dataset.lang===lang);
-      });
+li.querySelectorAll('.lang-btn').forEach(function(b){
+b.classList.toggle('active',b.dataset.lang===lang);
+});
 
-      applyNavI18n();
+applyNavI18n();
 
-    });
+});
 
-  });
+});
 
 }
 
 
 /* ============================================================
-   HAMBURGER MENU
+   HAMBURGER
    ============================================================ */
 
 function setupHamburger(){
 
-  var ham = document.getElementById('navHam');
-  var links = document.getElementById('navLinks');
+var ham=document.getElementById('navHam');
+var links=document.getElementById('navLinks');
 
-  if(ham && links){
-    ham.addEventListener('click',function(){
-      links.classList.toggle('open');
-    });
-  }
+if(ham&&links){
+ham.addEventListener('click',function(){
+links.classList.toggle('open');
+});
+}
 
 }
 
@@ -173,82 +176,80 @@ function setupHamburger(){
 
 async function injectAuthUI(){
 
-  var navLinks = document.getElementById('navLinks');
-  if(!navLinks || navLinks.querySelector('.nav-auth-item')) return;
+var navLinks=document.getElementById('navLinks');
+if(!navLinks||navLinks.querySelector('.nav-auth-item')) return;
 
-  var li = document.createElement('li');
-  li.className = 'nav-auth-item';
+var li=document.createElement('li');
+li.className='nav-auth-item';
 
-  var logged = false;
-  var email = '';
+var logged=false;
+var email='';
 
-  if(typeof Auth !== 'undefined'){
-    try{
-      logged = await Auth.isLoggedIn();
+if(typeof Auth!=='undefined'){
+try{
 
-      if(logged && typeof SupaDB !== 'undefined'){
-        var session = await SupaDB.getSession();
-        if(session && session.user){
-          email = session.user.email || '';
-        }
-      }
+logged=await Auth.isLoggedIn();
 
-    }catch(e){}
-  }
+if(logged&&typeof SupaDB!=='undefined'){
+var session=await SupaDB.getSession();
 
-  if(logged){
+if(session&&session.user){
+email=session.user.email||'';
+}
+}
 
-    var initial = email ? email.charAt(0).toUpperCase() : 'A';
+}catch(e){}
+}
 
-    li.innerHTML =
-      '<div class="nav-profile-wrapper">'+
-      '<button class="nav-profile-avatar" id="profileAvatarBtn">'+initial+'</button>'+
-      '<div class="nav-profile-menu" id="profileMenu">'+
+if(logged){
 
-      '<a href="admin.html" class="profile-menu-item">📊 Dashboard</a>'+
-      '<a href="characters.html" class="profile-menu-item">⚔ Characters</a>'+
-      '<a href="tierlist.html" class="profile-menu-item">🏆 Tier List</a>'+
-      '<a href="events.html" class="profile-menu-item">🎉 Events</a>'+
-    '<a href="guides.html" class="profile-menu-item">🎉 Guides</a>'+
+var initial=email?email.charAt(0).toUpperCase():'A';
 
-      '<div class="profile-menu-divider"></div>'+
+li.innerHTML=
+'<div class="nav-profile-wrapper">'+
+'<button class="nav-profile-avatar" id="profileAvatarBtn">'+initial+'</button>'+
+'<div class="nav-profile-menu" id="profileMenu">'+
+'<a href="admin.html" class="profile-menu-item">📊 Dashboard</a>'+
+'<a href="characters.html" class="profile-menu-item">⚔ Characters</a>'+
+'<a href="tierlist.html" class="profile-menu-item">🏆 Tier List</a>'+
+'<a href="events.html" class="profile-menu-item">🎉 Events</a>'+
+'<a href="guides.html" class="profile-menu-item">📘 Guides</a>'+
+'<div class="profile-menu-divider"></div>'+
+'<button class="profile-menu-item logout-item" onclick="Auth.logout()">Logout</button>'+
+'</div>'+
+'</div>';
 
-      '<button class="profile-menu-item logout-item" onclick="Auth.logout()">Logout</button>'+
+navLinks.appendChild(li);
 
-      '</div>'+
-      '</div>';
+var avatar=document.getElementById('profileAvatarBtn');
+var menu=document.getElementById('profileMenu');
 
-    navLinks.appendChild(li);
+avatar.addEventListener('click',function(e){
 
-    var avatar = document.getElementById('profileAvatarBtn');
-    var menu = document.getElementById('profileMenu');
+e.stopPropagation();
+menu.classList.toggle('open');
 
-    avatar.addEventListener('click',function(e){
+});
 
-      e.stopPropagation();
-      menu.classList.toggle('open');
+document.addEventListener('click',function(e){
 
-    });
+if(!menu.contains(e.target)&&e.target!==avatar){
+menu.classList.remove('open');
+}
 
-    document.addEventListener('click',function(e){
+});
 
-      if(!menu.contains(e.target) && e.target!==avatar){
-        menu.classList.remove('open');
-      }
+}
+else{
 
-    });
+li.innerHTML=
+'<a href="login.html" class="nav-login-btn">'+
+'<span class="nav-login-icon">🔐</span> Login'+
+'</a>';
 
-  }
-  else{
+navLinks.appendChild(li);
 
-    li.innerHTML =
-      '<a href="login.html" class="nav-login-btn">'+
-      '<span class="nav-login-icon">🔐</span> Login'+
-      '</a>';
-
-    navLinks.appendChild(li);
-
-  }
+}
 
 }
 
@@ -259,21 +260,22 @@ async function injectAuthUI(){
 
 function getLabel(key){
 
-  if(typeof I18n !== 'undefined'){
-    return I18n.t(key).toUpperCase();
-  }
+if(typeof I18n!=='undefined'){
+return I18n.t(key);
+}
 
-  return key;
+return key;
 
 }
 
 function getLang(){
 
-  if(typeof I18n !== 'undefined'){
-    return I18n.getLang();
-  }
+if(typeof I18n!=='undefined'){
+return I18n.getLang();
+}
 
-  return 'en';
+return 'en';
+
 }
 
 
@@ -281,9 +283,8 @@ function getLang(){
    START
    ============================================================ */
 
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded',initNavbar);
-}
-else{
-  initNavbar();
+if(document.readyState==='loading'){
+document.addEventListener('DOMContentLoaded',initNavbar);
+}else{
+initNavbar();
 }
