@@ -1,221 +1,279 @@
 /* ============================================================
-   Navbar - Hamburger toggle + Active link + Language Switcher
-   + Google-style Admin Profile Menu + Login Button
-   Global i18n integration: all nav text uses data-i18n
+   NAVBAR SYSTEM (Stable Version)
+   - icon + text render once
+   - language switch
+   - auth profile menu
    ============================================================ */
-/* ── NAVIGATION MAP ── */
-const navMap = {
 
- 'index.html': { icon: '🏠', key: 'nav_home' },
+/* NAV MAP */
+const navMap = {
+  'index.html': { icon: '🏠', key: 'nav_home' },
   'characters.html': { icon: '⚔', key: 'nav_characters' },
   'tierlist.html': { icon: '🏆', key: 'nav_tierlist' },
   'events.html': { icon: '🎉', key: 'nav_events' }
-
 };
 
-/* =========================
+
+/* ============================================================
    INIT NAVBAR
-========================= */
+   ============================================================ */
 
 function initNavbar(){
 
-if(window._navbarInitDone) return;
-window._navbarInitDone = true;
+  if(window._navbarInitDone) return;
+  window._navbarInitDone = true;
 
-/* render navbar */
-document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+  renderNavbar();
+  setupHamburger();
+  setupLangSwitch();
+  injectAuthUI();
 
-var href = a.getAttribute('href');
-if (!href) return;
-
-var page = href.split('/').pop();
-var mapping = navMap[page];
-if (!mapping) return;
-
-var label = I18n.t(mapping.key);
-
-/* หา icon */
-var icon = a.querySelector('.nav-icon');
-
-/* ถ้าไม่มี icon ให้สร้าง */
-if(!icon){
-icon = document.createElement("span");
-icon.className = "nav-icon";
-icon.innerHTML = mapping.icon;
-a.prepend(icon);
-}
-
-/* หา text */
-var text = a.querySelector('.nav-text');
-
-if(!text){
-text = document.createElement("span");
-text.className = "nav-text";
-a.appendChild(text);
-}
-
-/* update text */
-text.textContent = label.toUpperCase();
-
-});
-
-/* language switch */
-setupLangSwitch();
-
-/* hamburger */
-var ham = document.getElementById('navHam');
-var links = document.getElementById('navLinks');
-
-if(ham && links){
-ham.addEventListener('click', function(){
-links.classList.toggle('open');
-});
-}
-
-/* auth menu */
-injectAuthUI();
-
-  /* ── Listen for language changes to update navbar text ── */
-  if (typeof I18n !== 'undefined') {
-    I18n.onChange(function() {
-      applyNavI18n();
-    });
+  /* update text when language changes */
+  if(typeof I18n !== 'undefined'){
+    I18n.onChange(applyNavI18n);
   }
 }
 
-function applyNavI18n(); {
 
-if (typeof I18n === 'undefined') return;
+/* ============================================================
+   RENDER NAVBAR ICON + TEXT
+   ============================================================ */
 
-document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+function renderNavbar(){
 
-var href = a.getAttribute('href');
-if (!href) return;
+  document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
 
-var page = href.split('/').pop();
-var mapping = navMap[page];
-if (!mapping) return;
+    var href = a.getAttribute('href');
+    if(!href) return;
 
-var label = I18n.t(mapping.key);
+    var page = href.split('/').pop();
+    var mapping = navMap[page];
+    if(!mapping) return;
 
-var text = a.querySelector('.nav-text');
-if(text){
-text.textContent = label.toUpperCase();
-}
+    a.innerHTML = '';
 
-});
+    var icon = document.createElement("span");
+    icon.className = "nav-icon";
+    icon.innerHTML = mapping.icon;
 
-}
+    var text = document.createElement("span");
+    text.className = "nav-text";
+    text.textContent = getLabel(mapping.key);
 
-  /* Update login button text if present */
-  var loginBtn = document.querySelector('.nav-login-btn');
-  if (loginBtn) {
-    loginBtn.innerHTML = '<span class="nav-login-icon">&#128274;</span> ' + I18n.t('nav_login');
-  }
+    a.appendChild(icon);
+    a.appendChild(document.createTextNode(' '));
+    a.appendChild(text);
 
-  /* Update profile menu items if present */
-  document.querySelectorAll('.profile-menu-item[data-i18n-key]').forEach(function(el) {
-    var key = el.getAttribute('data-i18n-key');
-    var icon = el.querySelector('.pmi-icon');
-    var iconHtml = icon ? icon.outerHTML + ' ' : '';
-    el.innerHTML = iconHtml + I18n.t(key);
   });
 
-  /* Update footer */
-  var footerText = document.querySelector('[data-i18n="footer_text"]');
-  if (footerText) footerText.textContent = I18n.t('footer_text');
 }
 
-async function injectAuthUI() {
+
+/* ============================================================
+   LANGUAGE UPDATE
+   ============================================================ */
+
+function applyNavI18n(){
+
+  document.querySelectorAll('.navbar-links > li > a').forEach(function(a){
+
+    var href = a.getAttribute('href');
+    if(!href) return;
+
+    var page = href.split('/').pop();
+    var mapping = navMap[page];
+    if(!mapping) return;
+
+    var text = a.querySelector('.nav-text');
+    if(text){
+      text.textContent = getLabel(mapping.key);
+    }
+
+  });
+
+}
+
+
+/* ============================================================
+   LANGUAGE SWITCH BUTTON
+   ============================================================ */
+
+function setupLangSwitch(){
+
   var navLinks = document.getElementById('navLinks');
-  if (!navLinks || navLinks.querySelector('.nav-auth-item')) return;
+  if(!navLinks || navLinks.querySelector('.nav-lang-switcher')) return;
+
+  var li = document.createElement('li');
+  li.className = 'nav-lang-switcher';
+
+  var current = getLang();
+
+  li.innerHTML =
+    '<div class="lang-switch-group">'+
+    '<button class="lang-btn '+(current==='en'?'active':'')+'" data-lang="en">EN</button>'+
+    '<span class="lang-divider">|</span>'+
+    '<button class="lang-btn '+(current==='th'?'active':'')+'" data-lang="th">TH</button>'+
+    '</div>';
+
+  navLinks.appendChild(li);
+
+  li.querySelectorAll('.lang-btn').forEach(function(btn){
+
+    btn.addEventListener('click',function(){
+
+      var lang = btn.dataset.lang;
+
+      if(typeof I18n !== 'undefined'){
+        I18n.setLang(lang);
+      }
+
+      li.querySelectorAll('.lang-btn').forEach(b=>{
+        b.classList.toggle('active',b.dataset.lang===lang);
+      });
+
+      applyNavI18n();
+
+    });
+
+  });
+
+}
+
+
+/* ============================================================
+   HAMBURGER MENU
+   ============================================================ */
+
+function setupHamburger(){
+
+  var ham = document.getElementById('navHam');
+  var links = document.getElementById('navLinks');
+
+  if(ham && links){
+    ham.addEventListener('click',function(){
+      links.classList.toggle('open');
+    });
+  }
+
+}
+
+
+/* ============================================================
+   AUTH MENU
+   ============================================================ */
+
+async function injectAuthUI(){
+
+  var navLinks = document.getElementById('navLinks');
+  if(!navLinks || navLinks.querySelector('.nav-auth-item')) return;
 
   var li = document.createElement('li');
   li.className = 'nav-auth-item';
 
-  var isAdmin = false;
-  var userEmail = '';
-  if (typeof Auth !== 'undefined') {
-    try {
-      isAdmin = await Auth.isLoggedIn();
-      if (isAdmin && typeof SupaDB !== 'undefined') {
+  var logged = false;
+  var email = '';
+
+  if(typeof Auth !== 'undefined'){
+    try{
+      logged = await Auth.isLoggedIn();
+
+      if(logged && typeof SupaDB !== 'undefined'){
         var session = await SupaDB.getSession();
-        if (session && session.user) userEmail = session.user.email || '';
+        if(session && session.user){
+          email = session.user.email || '';
+        }
       }
-    } catch(e) {}
+
+    }catch(e){}
   }
 
-  if (isAdmin) {
-    var initial = userEmail ? userEmail.charAt(0).toUpperCase() : 'A';
-    var t = function(k) { return (typeof I18n !== 'undefined') ? I18n.t(k) : k; };
+  if(logged){
+
+    var initial = email ? email.charAt(0).toUpperCase() : 'A';
+
     li.innerHTML =
-      '<div class="nav-profile-wrapper">' +
-        '<button class="nav-profile-avatar" id="profileAvatarBtn" title="Admin Menu">' + initial + '</button>' +
-        '<div class="nav-profile-menu" id="profileMenu">' +
-          '<div class="profile-menu-header">' +
-            '<div class="profile-menu-avatar">' + initial + '</div>' +
-            '<div class="profile-menu-info">' +
-              '<div class="profile-menu-role">Admin</div>' +
-              '<div class="profile-menu-email">' + escNavHtml(userEmail) + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="profile-menu-divider"></div>' +
-          '<a href="admin.html" class="profile-menu-item" data-i18n-key="menu_dashboard"><span class="pmi-icon">&#128200;</span> ' + t('menu_dashboard') + '</a>' +
-          '<a href="characters.html" class="profile-menu-item" data-i18n-key="menu_characters"><span class="pmi-icon">&#9876;</span> ' + t('menu_characters') + '</a>' +
-          '<a href="tierlist.html" class="profile-menu-item" data-i18n-key="menu_tierlist"><span class="pmi-icon">&#127942;</span> ' + t('menu_tierlist') + '</a>' +
-          '<a href="events.html" class="profile-menu-item" data-i18n-key="menu_events"><span class="pmi-icon">&#127881;</span> ' + t('menu_events') + '</a>' +
-          '<div class="profile-menu-divider"></div>' +
-          '<button class="profile-menu-item logout-item" data-i18n-key="menu_logout" onclick="Auth.logout()"><span class="pmi-icon">&#128682;</span> ' + t('menu_logout') + '</button>' +
-        '</div>' +
+      '<div class="nav-profile-wrapper">'+
+      '<button class="nav-profile-avatar" id="profileAvatarBtn">'+initial+'</button>'+
+      '<div class="nav-profile-menu" id="profileMenu">'+
+
+      '<a href="admin.html" class="profile-menu-item">📊 Dashboard</a>'+
+      '<a href="characters.html" class="profile-menu-item">⚔ Characters</a>'+
+      '<a href="tierlist.html" class="profile-menu-item">🏆 Tier List</a>'+
+      '<a href="events.html" class="profile-menu-item">🎉 Events</a>'+
+
+      '<div class="profile-menu-divider"></div>'+
+
+      '<button class="profile-menu-item logout-item" onclick="Auth.logout()">Logout</button>'+
+
+      '</div>'+
       '</div>';
 
     navLinks.appendChild(li);
 
-    /* Toggle profile menu */
-    var avatarBtn = document.getElementById('profileAvatarBtn');
-    var profileMenu = document.getElementById('profileMenu');
-    if (avatarBtn && profileMenu) {
-      avatarBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        profileMenu.classList.toggle('open');
-      });
-      document.addEventListener('click', function (e) {
-        if (!profileMenu.contains(e.target) && e.target !== avatarBtn) {
-          profileMenu.classList.remove('open');
-        }
-      });
-    }
-  } else {
-    var loginText = (typeof I18n !== 'undefined') ? I18n.t('nav_login') : 'Login';
+    var avatar = document.getElementById('profileAvatarBtn');
+    var menu = document.getElementById('profileMenu');
+
+    avatar.addEventListener('click',function(e){
+
+      e.stopPropagation();
+      menu.classList.toggle('open');
+
+    });
+
+    document.addEventListener('click',function(e){
+
+      if(!menu.contains(e.target) && e.target!==avatar){
+        menu.classList.remove('open');
+      }
+
+    });
+
+  }
+  else{
+
     li.innerHTML =
-      '<a href="login.html" class="nav-login-btn" title="Login">' +
-        '<span class="nav-login-icon">&#128274;</span> ' + loginText +
+      '<a href="login.html" class="nav-login-btn">'+
+      '<span class="nav-login-icon">🔐</span> Login'+
       '</a>';
+
     navLinks.appendChild(li);
+
   }
+
 }
 
-function escNavHtml(str) {
-  if (!str) return '';
-  var d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
 
-function switchLang(lang) {
-  if (typeof I18n !== 'undefined') {
-    I18n.setLang(lang);
+/* ============================================================
+   UTIL
+   ============================================================ */
+
+function getLabel(key){
+
+  if(typeof I18n !== 'undefined'){
+    return I18n.t(key).toUpperCase();
   }
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-  /* Re-apply navbar translations */
-  applyNavI18n();
+
+  return key;
+
 }
 
-/* Run immediately if DOM is ready, otherwise wait */
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initNavbar);
-} else {
+function getLang(){
+
+  if(typeof I18n !== 'undefined'){
+    return I18n.getLang();
+  }
+
+  return 'en';
+}
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded',initNavbar);
+}
+else{
   initNavbar();
 }
