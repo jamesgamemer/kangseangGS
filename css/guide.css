@@ -67,3 +67,29 @@ border-radius:8px;
 position:sticky;
 top:80px;
 }
+.sidebar h3{
+margin-top:0;
+margin-bottom:15px;
+font-size:18px;
+color:#fff;
+}
+
+#toc{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+#toc li{
+margin-bottom:8px;
+}
+
+#toc a{
+color:#9ca3af;
+text-decoration:none;
+font-size:14px;
+}
+
+#toc a:hover{
+color:#fff;
+}
