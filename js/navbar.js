@@ -201,6 +201,7 @@ async function injectAuthUI(){
       '<a href="characters.html" class="profile-menu-item">⚔ Characters</a>'+
       '<a href="tierlist.html" class="profile-menu-item">🏆 Tier List</a>'+
       '<a href="events.html" class="profile-menu-item">🎉 Events</a>'+
+    '<a href="guides.html" class="profile-menu-item">🎉 Guides</a>'+
 
       '<div class="profile-menu-divider"></div>'+
 
