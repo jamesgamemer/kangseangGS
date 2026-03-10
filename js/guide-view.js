@@ -5,80 +5,65 @@ const slug = params.get("slug")
 
 async function loadGuide(){
 
-const { data, error } = await db
+const { data:guide } = await db
 .from("guides")
 .select("*")
-.eq("slug", slug)
+.eq("slug",slug)
 .single()
 
-if(error || !data){
+document.getElementById("guideTitle").textContent = guide.title
 
-console.log(error)
-
-document.getElementById("guideContent").innerHTML = `
-<h2>Guide not found</h2>
-`
-
-return
-}
-
-document.getElementById("guideTitle").innerText = data.title
-
-const date = new Date(data.created_at)
-
-document.getElementById("guideDate").innerText =
-date.toLocaleDateString()
+const { data:blocks } = await db
+.from("guide_blocks")
+.select("*")
+.eq("guide_id",guide.id)
+.order("position")
 
 const container = document.getElementById("guideContent")
 
-container.innerHTML = `
+blocks.forEach(b=>{
 
-<div class="guide-section">
-<h2 id="about">ABOUT THE GAME</h2>
-<p>This guide will help you understand the basic mechanics of the game.</p>
-</div>
+let html=""
 
-<div class="guide-section">
-<h2 id="links">OFFICIAL LINKS</h2>
-
-<ul>
-<li><a href="#">Official Website</a></li>
-<li><a href="#">Official Discord</a></li>
-<li><a href="#">Official YouTube</a></li>
-</ul>
-
-</div>
-
-<div class="tip-box">
-Tip: Focus on leveling your main character first.
-</div>
-
-<div class="warning-box">
-Warning: Do not waste premium currency early.
-</div>
-
-`
-
-createTOC()
-
+if(b.type==="banner"){
+html=`
+<div class="guide-banner">
+<img src="images/guides/${b.image}">
+</div>`
 }
 
-function createTOC(){
+if(b.type==="text"){
+html=`
+<div class="guide-section">
+<h2>${b.title}</h2>
+<p>${b.content}</p>
+</div>`
+}
 
-const toc = document.getElementById("toc")
+if(b.type==="tip"){
+html=`
+<div class="guide-tip">
+<strong>TIP</strong>
+<p>${b.content}</p>
+</div>`
+}
 
-toc.innerHTML = ""
+if(b.type==="warning"){
+html=`
+<div class="guide-warning">
+<strong>WARNING</strong>
+<p>${b.content}</p>
+</div>`
+}
 
-document.querySelectorAll(".guide-section h2").forEach(section => {
+if(b.type==="image"){
+html=`
+<div class="guide-image">
+<img src="images/guides/${b.image}">
+</div>`
+}
 
-const id = section.id
-const text = section.innerText
-
-const li = document.createElement("li")
-
-li.innerHTML = `<a href="#${id}">${text}</a>`
-
-toc.appendChild(li)
+container.innerHTML += html
 
 })
 
