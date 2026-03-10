@@ -7,7 +7,7 @@
 
 /* ---- Admin Bar ---- */
 .admin-bar {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
@@ -106,18 +106,18 @@
 .admin-bar-btn.cancel-btn:hover {
   background: rgba(239,68,68,0.15);
 }
-
-/* Shift navbar down when admin bar is visible */
-body:has(.admin-bar[style*="display: flex"]) .navbar,
-body:has(.admin-bar[style*="display:flex"]) .navbar {
-  top: 40px;
+/* FIX ADMIN BAR + NAVBAR */
+.admin-bar{
+position:sticky;
+top:0;
+z-index:1200;
 }
 
-body:has(.admin-bar[style*="display: flex"]) .page-content,
-body:has(.admin-bar[style*="display:flex"]) .page-content {
-  padding-top: 104px;
+.navbar{
+position:sticky;
+top:40px;
+z-index:1000;
 }
-
 /* ---- Login Page ---- */
 .login-wrapper {
   display: flex;
@@ -908,4 +908,7 @@ body:has(.admin-bar[style*="display:flex"]) .page-content {
     padding: 4px 8px;
     font-size: 12px;
   }
+   body{
+overflow-x:hidden;
 }
+
